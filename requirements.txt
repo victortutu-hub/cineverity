@@ -1,0 +1,2 @@
+# Initial scaffold only.
+# Add pinned dependencies when backend implementation begins.
