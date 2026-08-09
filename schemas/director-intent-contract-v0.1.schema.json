@@ -1,0 +1,583 @@
+{
+  "$defs": {
+    "Ambiguity": {
+      "additionalProperties": false,
+      "description": "Identified ambiguity in the prompt or technical specification.",
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "impact": {
+          "minLength": 1,
+          "title": "Impact",
+          "type": "string"
+        },
+        "resolution": {
+          "$ref": "#/$defs/AmbiguityResolution"
+        },
+        "topic": {
+          "minLength": 1,
+          "title": "Topic",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "topic",
+        "description",
+        "impact",
+        "resolution"
+      ],
+      "title": "Ambiguity",
+      "type": "object"
+    },
+    "AmbiguityResolution": {
+      "description": "Strategy for resolving prompt or technical ambiguities.",
+      "enum": [
+        "defer_to_research_or_user",
+        "art_directable",
+        "requires_validation",
+        "user_input_required"
+      ],
+      "title": "AmbiguityResolution",
+      "type": "string"
+    },
+    "ArtisticFreedom": {
+      "additionalProperties": false,
+      "description": "Explicit area where artistic expression overrides physical realism.",
+      "properties": {
+        "aspect": {
+          "minLength": 1,
+          "title": "Aspect",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "aspect",
+        "reason"
+      ],
+      "title": "ArtisticFreedom",
+      "type": "object"
+    },
+    "CinematicIntent": {
+      "additionalProperties": false,
+      "description": "Cinematic camera, motion, visual style, and timing requirements.",
+      "properties": {
+        "camera_requirements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Camera Requirements",
+          "type": "array"
+        },
+        "contrast_strategy": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Contrast Strategy"
+        },
+        "motion_requirements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Motion Requirements",
+          "type": "array"
+        },
+        "subject_priority": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subject Priority"
+        },
+        "temporal_requirements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Temporal Requirements",
+          "type": "array"
+        },
+        "visual_style": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Visual Style",
+          "type": "array"
+        }
+      },
+      "required": [
+        "visual_style",
+        "camera_requirements",
+        "motion_requirements",
+        "temporal_requirements"
+      ],
+      "title": "CinematicIntent",
+      "type": "object"
+    },
+    "CreativeIntent": {
+      "additionalProperties": false,
+      "description": "High-level creative goals, mood, and reality mode.",
+      "properties": {
+        "core_idea": {
+          "minLength": 1,
+          "title": "Core Idea",
+          "type": "string"
+        },
+        "desired_emotion": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Desired Emotion",
+          "type": "array"
+        },
+        "reality_mode": {
+          "$ref": "#/$defs/RealityMode"
+        },
+        "visual_priorities": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Visual Priorities",
+          "type": "array"
+        }
+      },
+      "required": [
+        "core_idea",
+        "desired_emotion",
+        "visual_priorities",
+        "reality_mode"
+      ],
+      "title": "CreativeIntent",
+      "type": "object"
+    },
+    "EnvironmentIntent": {
+      "additionalProperties": false,
+      "description": "Environmental context, atmosphere, background, and surface properties.",
+      "properties": {
+        "atmosphere": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Atmosphere"
+        },
+        "background_priority": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Background Priority"
+        },
+        "environmental_effects": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Environmental Effects",
+          "type": "array"
+        },
+        "setting": {
+          "minLength": 1,
+          "title": "Setting",
+          "type": "string"
+        },
+        "surface": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Surface"
+        }
+      },
+      "required": [
+        "setting",
+        "environmental_effects"
+      ],
+      "title": "EnvironmentIntent",
+      "type": "object"
+    },
+    "LightingIntent": {
+      "additionalProperties": false,
+      "description": "Artistic lighting setup, roles, and interaction targets.",
+      "properties": {
+        "color_intent": {
+          "minLength": 1,
+          "title": "Color Intent",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "interaction_target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Interaction Target"
+        },
+        "role": {
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "role",
+        "color_intent"
+      ],
+      "title": "LightingIntent",
+      "type": "object"
+    },
+    "MaterialIntent": {
+      "additionalProperties": false,
+      "description": "Artistic material properties and physical unknowns associated with an entity.",
+      "properties": {
+        "desired_properties": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Desired Properties",
+          "type": "array"
+        },
+        "entity_id": {
+          "minLength": 1,
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "material_family": {
+          "minLength": 1,
+          "title": "Material Family",
+          "type": "string"
+        },
+        "unknown_parameters": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unknown Parameters",
+          "type": "array"
+        }
+      },
+      "required": [
+        "entity_id",
+        "material_family",
+        "desired_properties",
+        "unknown_parameters"
+      ],
+      "title": "MaterialIntent",
+      "type": "object"
+    },
+    "PhysicalQuestion": {
+      "additionalProperties": false,
+      "description": "Technical question regarding physical feasibility or material behavior.",
+      "properties": {
+        "domain": {
+          "minLength": 1,
+          "title": "Domain",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "priority": {
+          "$ref": "#/$defs/Priority"
+        },
+        "question": {
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "related_entities": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Related Entities",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "domain",
+        "question",
+        "related_entities",
+        "priority"
+      ],
+      "title": "PhysicalQuestion",
+      "type": "object"
+    },
+    "Priority": {
+      "description": "Priority level for questions, research requirements, and constraints.",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "title": "Priority",
+      "type": "string"
+    },
+    "RealityMode": {
+      "description": "Categorizes how the scene relates to real-world physics.",
+      "enum": [
+        "strict_physical",
+        "physically_grounded_artistic",
+        "speculative_but_coherent",
+        "explicitly_nonphysical"
+      ],
+      "title": "RealityMode",
+      "type": "string"
+    },
+    "ResearchRequirement": {
+      "additionalProperties": false,
+      "description": "Topic requiring scientific lookup or evidence gathering.",
+      "properties": {
+        "desired_evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Desired Evidence",
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "priority": {
+          "$ref": "#/$defs/Priority"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "topic": {
+          "minLength": 1,
+          "title": "Topic",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "topic",
+        "reason",
+        "desired_evidence",
+        "priority"
+      ],
+      "title": "ResearchRequirement",
+      "type": "object"
+    },
+    "SceneEntity": {
+      "additionalProperties": false,
+      "description": "An object, participant, or geometric element present in the scene.",
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "minLength": 1,
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "description"
+      ],
+      "title": "SceneEntity",
+      "type": "object"
+    },
+    "ValidationTarget": {
+      "additionalProperties": false,
+      "description": "Target condition to be validated by downstream validation agents.",
+      "properties": {
+        "domain": {
+          "minLength": 1,
+          "title": "Domain",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "target": {
+          "minLength": 1,
+          "title": "Target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "target",
+        "domain"
+      ],
+      "title": "ValidationTarget",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Top-level validated Cinematic Intent Contract produced by the Director Agent.",
+  "properties": {
+    "agent": {
+      "const": "director_agent",
+      "title": "Agent",
+      "type": "string"
+    },
+    "ambiguities": {
+      "items": {
+        "$ref": "#/$defs/Ambiguity"
+      },
+      "title": "Ambiguities",
+      "type": "array"
+    },
+    "artistic_freedoms": {
+      "items": {
+        "$ref": "#/$defs/ArtisticFreedom"
+      },
+      "title": "Artistic Freedoms",
+      "type": "array"
+    },
+    "cinematic_intent": {
+      "$ref": "#/$defs/CinematicIntent"
+    },
+    "contract_version": {
+      "const": "0.1",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "creative_intent": {
+      "$ref": "#/$defs/CreativeIntent"
+    },
+    "director_summary": {
+      "minLength": 1,
+      "title": "Director Summary",
+      "type": "string"
+    },
+    "environment_intent": {
+      "$ref": "#/$defs/EnvironmentIntent"
+    },
+    "hard_constraints": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Hard Constraints",
+      "type": "array"
+    },
+    "lighting_intent": {
+      "items": {
+        "$ref": "#/$defs/LightingIntent"
+      },
+      "title": "Lighting Intent",
+      "type": "array"
+    },
+    "material_intent": {
+      "items": {
+        "$ref": "#/$defs/MaterialIntent"
+      },
+      "title": "Material Intent",
+      "type": "array"
+    },
+    "physical_questions": {
+      "items": {
+        "$ref": "#/$defs/PhysicalQuestion"
+      },
+      "title": "Physical Questions",
+      "type": "array"
+    },
+    "research_required": {
+      "items": {
+        "$ref": "#/$defs/ResearchRequirement"
+      },
+      "title": "Research Required",
+      "type": "array"
+    },
+    "scene_entities": {
+      "items": {
+        "$ref": "#/$defs/SceneEntity"
+      },
+      "title": "Scene Entities",
+      "type": "array"
+    },
+    "validation_targets": {
+      "items": {
+        "$ref": "#/$defs/ValidationTarget"
+      },
+      "title": "Validation Targets",
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_version",
+    "agent",
+    "creative_intent",
+    "scene_entities",
+    "material_intent",
+    "lighting_intent",
+    "environment_intent",
+    "cinematic_intent",
+    "physical_questions",
+    "research_required",
+    "artistic_freedoms",
+    "hard_constraints",
+    "ambiguities",
+    "validation_targets",
+    "director_summary"
+  ],
+  "title": "DirectorIntentContract",
+  "type": "object"
+}
