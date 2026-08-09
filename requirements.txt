@@ -1,2 +1,2 @@
-# Initial scaffold only.
-# Add pinned dependencies when backend implementation begins.
+google-genai
+google-cloud-aiplatform[agent_engines,adk]>=1.112
