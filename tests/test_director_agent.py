@@ -4,7 +4,12 @@ Deterministic unit tests for Director Agent configuration and runtime validation
 These tests run locally without making live Gemini network calls.
 """
 
+import asyncio
 import json
+import os
+import sys
+import types
+
 import pytest
 from pydantic import ValidationError
 
@@ -181,3 +186,92 @@ def test_9_validation_errors_fail_clearly_without_repair():
         validate_director_response(malformed_json)
 
     assert "Director Agent response failed Pydantic validation" in str(exc_info.value)
+
+
+def test_10_model_configuration_env_handling(monkeypatch):
+    """Test 10: Model configuration handles gemini-3.5-flash, alternatives, and missing env without rewrite."""
+    from scripts.run_director_agent import get_env_setting
+
+    # 1. CINEVERITY_GEMINI_MODEL=gemini-3.5-flash remains gemini-3.5-flash
+    monkeypatch.setenv("CINEVERITY_GEMINI_MODEL", "gemini-3.5-flash")
+    assert get_env_setting("CINEVERITY_GEMINI_MODEL", "gemini-3.5-flash") == "gemini-3.5-flash"
+
+    # 2. Explicitly supplied alternative model remains unchanged
+    monkeypatch.setenv("CINEVERITY_GEMINI_MODEL", "gemini-2.5-flash")
+    assert get_env_setting("CINEVERITY_GEMINI_MODEL", "gemini-3.5-flash") == "gemini-2.5-flash"
+
+    # 3. Missing variable defaults to gemini-3.5-flash
+    monkeypatch.delenv("CINEVERITY_GEMINI_MODEL", raising=False)
+    assert get_env_setting("CINEVERITY_GEMINI_MODEL", "gemini-3.5-flash") == "gemini-3.5-flash"
+
+
+def test_11_director_agent_module_import_model_resolution(monkeypatch):
+    """Test 11: Controlled reload of director_agent module under different environment variables."""
+    import importlib
+    import sys
+    import src.agents.director_agent
+
+    target_module = sys.modules["src.agents.director_agent"]
+
+    # Test default fallback when env is unset
+    monkeypatch.delenv("CINEVERITY_GEMINI_MODEL", raising=False)
+    reloaded_da = importlib.reload(target_module)
+    assert reloaded_da.MODEL == "gemini-3.5-flash"
+    assert reloaded_da.director_agent.model == "gemini-3.5-flash"
+
+    # Test explicit gemini-3.5-flash setting
+    monkeypatch.setenv("CINEVERITY_GEMINI_MODEL", "gemini-3.5-flash")
+    reloaded_da_2 = importlib.reload(target_module)
+    assert reloaded_da_2.MODEL == "gemini-3.5-flash"
+    assert reloaded_da_2.director_agent.model == "gemini-3.5-flash"
+
+    # Test explicit alternative setting
+    monkeypatch.setenv("CINEVERITY_GEMINI_MODEL", "gemini-2.5-flash")
+    reloaded_da_3 = importlib.reload(target_module)
+    assert reloaded_da_3.MODEL == "gemini-2.5-flash"
+    assert reloaded_da_3.director_agent.model == "gemini-2.5-flash"
+
+    # Clean up by reloading default
+    monkeypatch.delenv("CINEVERITY_GEMINI_MODEL", raising=False)
+    importlib.reload(target_module)
+
+
+
+def test_12_runner_initializes_vertex_with_default_global_location_before_agent_import(monkeypatch):
+    """Runner configures Vertex AI locally before importing the Director runtime."""
+    import scripts.run_director_agent as runner
+
+    monkeypatch.delenv("GOOGLE_CLOUD_PROJECT", raising=False)
+    monkeypatch.delenv("GOOGLE_CLOUD_LOCATION", raising=False)
+    monkeypatch.delenv("GOOGLE_GENAI_USE_ENTERPRISE", raising=False)
+    monkeypatch.delenv("CINEVERITY_GEMINI_MODEL", raising=False)
+
+    init_calls = []
+    monkeypatch.setattr(
+        runner.vertexai,
+        "init",
+        lambda **kwargs: init_calls.append(kwargs),
+    )
+
+    fake_director_module = types.ModuleType("src.agents.director_agent")
+
+    class FakeDirectorApp:
+        async def async_stream_query(self, **kwargs):
+            raise RuntimeError("offline test stop")
+            yield  # pragma: no cover
+
+    fake_director_module.director_app = FakeDirectorApp()
+    fake_director_module.extract_text_from_adk_events = lambda events: "{}"
+    fake_director_module.validate_director_response = lambda raw_text: None
+    monkeypatch.setitem(sys.modules, "src.agents.director_agent", fake_director_module)
+
+    with pytest.raises(RuntimeError, match="offline test stop"):
+        asyncio.run(runner.run_director("offline test prompt"))
+
+    assert os.environ["GOOGLE_CLOUD_LOCATION"] == "global"
+    assert init_calls == [
+        {
+            "project": "cineverity-hackathon-2026",
+            "location": "global",
+        }
+    ]

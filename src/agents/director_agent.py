@@ -13,9 +13,10 @@ from vertexai import agent_engines
 
 from src.contracts.director_intent import DirectorIntentContract
 
-MODEL = os.getenv("CINEVERITY_GEMINI_MODEL")
-if not MODEL or MODEL == "gemini-3.5-flash":
-    MODEL = "gemini-2.5-flash"
+MODEL = os.getenv(
+    "CINEVERITY_GEMINI_MODEL",
+    "gemini-3.5-flash",
+)
 
 DIRECTOR_SYSTEM_INSTRUCTION = (
     "You are the CineVerity Director Agent. Your role is to interpret and decompose "

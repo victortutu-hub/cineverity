@@ -9,17 +9,13 @@ import asyncio
 import os
 import sys
 from pathlib import Path
+import vertexai
 
 # Allow running this script from the repository root without installing CineVerity
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from src.agents.director_agent import (
-    director_app,
-    extract_text_from_adk_events,
-    validate_director_response,
-)
 
 REFERENCE_PROMPT = (
     "A transparent crystal monolith levitates above a dark basalt surface while three "
@@ -36,7 +32,7 @@ ADVERSARIAL_PROMPT = (
 def get_env_setting(name: str, default: str) -> str:
     """Retrieve environment variable or fallback to default."""
     val = os.getenv(name)
-    if not val or (name == "CINEVERITY_GEMINI_MODEL" and val == "gemini-3.5-flash"):
+    if not val:
         val = default
         os.environ[name] = default
     return val
@@ -45,13 +41,21 @@ def get_env_setting(name: str, default: str) -> str:
 async def run_director(prompt: str) -> None:
     """Execute Director Agent query and validate output boundary."""
     project_id = get_env_setting("GOOGLE_CLOUD_PROJECT", "cineverity-hackathon-2026")
-    location = os.getenv("GOOGLE_CLOUD_LOCATION", "global")
+    location = get_env_setting("GOOGLE_CLOUD_LOCATION", "global")
     enterprise = get_env_setting("GOOGLE_GENAI_USE_ENTERPRISE", "True")
-    model = get_env_setting("CINEVERITY_GEMINI_MODEL", "gemini-2.5-flash")
+    model = get_env_setting("CINEVERITY_GEMINI_MODEL", "gemini-3.5-flash")
+
+    vertexai.init(project=project_id, location=location)
 
     if enterprise.lower() not in {"true", "1", "yes"}:
         print("[ERROR] GOOGLE_GENAI_USE_ENTERPRISE must be True.", file=sys.stderr)
         raise SystemExit(2)
+
+    from src.agents.director_agent import (
+        director_app,
+        extract_text_from_adk_events,
+        validate_director_response,
+    )
 
     print("CineVerity Phase 1 — Director Agent Structured Output Integration v0.1")
     print(f"Project : {project_id}")
