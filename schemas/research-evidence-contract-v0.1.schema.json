@@ -1,0 +1,603 @@
+{
+  "$defs": {
+    "ConflictResolutionStatus": {
+      "enum": [
+        "unresolved",
+        "context_dependent",
+        "requires_domain_validation"
+      ],
+      "title": "ConflictResolutionStatus",
+      "type": "string"
+    },
+    "EvidenceConflict": {
+      "additionalProperties": false,
+      "description": "Visible disagreement between already-recorded findings and/or sources.",
+      "properties": {
+        "contextual_explanation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Contextual Explanation"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "finding_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Finding Ids",
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "resolution_status": {
+          "$ref": "#/$defs/ConflictResolutionStatus"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "topic": {
+          "minLength": 1,
+          "title": "Topic",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "topic",
+        "finding_ids",
+        "source_ids",
+        "description",
+        "resolution_status"
+      ],
+      "title": "EvidenceConflict",
+      "type": "object"
+    },
+    "EvidenceSource": {
+      "additionalProperties": false,
+      "description": "Normalized source metadata. A source record is not itself a factual claim.",
+      "properties": {
+        "accessed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Accessed At"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "publication_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publication Date"
+        },
+        "publisher": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publisher"
+        },
+        "source_type": {
+          "$ref": "#/$defs/SourceType"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "source_type"
+      ],
+      "title": "EvidenceSource",
+      "type": "object"
+    },
+    "EvidenceStatus": {
+      "enum": [
+        "supported",
+        "partially_supported",
+        "conflicting",
+        "unsupported",
+        "insufficient_evidence"
+      ],
+      "title": "EvidenceStatus",
+      "type": "string"
+    },
+    "MaterialUnknownParameterReference": {
+      "additionalProperties": false,
+      "description": "Identity pair for a material parameter left unknown by the Director.",
+      "properties": {
+        "entity_id": {
+          "minLength": 1,
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "parameter": {
+          "minLength": 1,
+          "title": "Parameter",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entity_id",
+        "parameter"
+      ],
+      "title": "MaterialUnknownParameterReference",
+      "type": "object"
+    },
+    "PhysicalParameterEvidence": {
+      "additionalProperties": false,
+      "description": "Source-linked physical quantity preserved without coercing it to a scalar.",
+      "properties": {
+        "conditions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Conditions",
+          "type": "array"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "related_entity": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Related Entity"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncertainty"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "value_text": {
+          "minLength": 1,
+          "title": "Value Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value_text",
+        "source_ids",
+        "conditions"
+      ],
+      "title": "PhysicalParameterEvidence",
+      "type": "object"
+    },
+    "Priority": {
+      "description": "Priority level for questions, research requirements, and constraints.",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "title": "Priority",
+      "type": "string"
+    },
+    "ResearchCoverage": {
+      "additionalProperties": false,
+      "description": "Mandatory completion state for exactly one Director research requirement.",
+      "properties": {
+        "director_research_requirement_id": {
+          "minLength": 1,
+          "title": "Director Research Requirement Id",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "state": {
+          "$ref": "#/$defs/ResearchCoverageState"
+        }
+      },
+      "required": [
+        "director_research_requirement_id",
+        "state"
+      ],
+      "title": "ResearchCoverage",
+      "type": "object"
+    },
+    "ResearchCoverageState": {
+      "enum": [
+        "addressed",
+        "partially_addressed",
+        "unresolved"
+      ],
+      "title": "ResearchCoverageState",
+      "type": "string"
+    },
+    "ResearchFinding": {
+      "additionalProperties": false,
+      "description": "A source-linked research claim, not a final physical verdict.",
+      "properties": {
+        "claim": {
+          "minLength": 1,
+          "title": "Claim",
+          "type": "string"
+        },
+        "conditions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Conditions",
+          "type": "array"
+        },
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_research_requirement_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Research Requirement Ids",
+          "type": "array"
+        },
+        "domain": {
+          "minLength": 1,
+          "title": "Domain",
+          "type": "string"
+        },
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "missing_context": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Context",
+          "type": "array"
+        },
+        "physical_parameters": {
+          "items": {
+            "$ref": "#/$defs/PhysicalParameterEvidence"
+          },
+          "title": "Physical Parameters",
+          "type": "array"
+        },
+        "related_material_unknown_parameters": {
+          "items": {
+            "$ref": "#/$defs/MaterialUnknownParameterReference"
+          },
+          "title": "Related Material Unknown Parameters",
+          "type": "array"
+        },
+        "related_scene_entities": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Related Scene Entities",
+          "type": "array"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "claim",
+        "domain",
+        "evidence_status",
+        "source_ids",
+        "director_research_requirement_ids",
+        "director_physical_question_ids",
+        "related_scene_entities",
+        "related_material_unknown_parameters",
+        "conditions",
+        "limitations",
+        "missing_context",
+        "physical_parameters"
+      ],
+      "title": "ResearchFinding",
+      "type": "object"
+    },
+    "ResearchScope": {
+      "additionalProperties": false,
+      "description": "Explicit snapshot of Director identifiers available to this research result.",
+      "properties": {
+        "director_material_unknown_parameters": {
+          "items": {
+            "$ref": "#/$defs/MaterialUnknownParameterReference"
+          },
+          "title": "Director Material Unknown Parameters",
+          "type": "array"
+        },
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_research_requirement_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Research Requirement Ids",
+          "type": "array"
+        },
+        "director_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Scene Entity Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "director_research_requirement_ids",
+        "director_physical_question_ids",
+        "director_scene_entity_ids",
+        "director_material_unknown_parameters"
+      ],
+      "title": "ResearchScope",
+      "type": "object"
+    },
+    "SourceType": {
+      "enum": [
+        "peer_reviewed_paper",
+        "academic_reference",
+        "standards_document",
+        "government_or_institutional",
+        "manufacturer_technical_data",
+        "technical_documentation",
+        "authoritative_database",
+        "other"
+      ],
+      "title": "SourceType",
+      "type": "string"
+    },
+    "UnresolvedResearchQuestion": {
+      "additionalProperties": false,
+      "description": "Research gap retained for downstream work without a physical conclusion.",
+      "properties": {
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_research_requirement_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Research Requirement Ids",
+          "type": "array"
+        },
+        "evidence_needed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Needed",
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "priority": {
+          "$ref": "#/$defs/Priority"
+        },
+        "related_material_unknown_parameters": {
+          "items": {
+            "$ref": "#/$defs/MaterialUnknownParameterReference"
+          },
+          "title": "Related Material Unknown Parameters",
+          "type": "array"
+        },
+        "topic": {
+          "minLength": 1,
+          "title": "Topic",
+          "type": "string"
+        },
+        "why_unresolved": {
+          "minLength": 1,
+          "title": "Why Unresolved",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "topic",
+        "why_unresolved",
+        "evidence_needed",
+        "priority",
+        "director_research_requirement_ids",
+        "director_physical_question_ids",
+        "related_material_unknown_parameters"
+      ],
+      "title": "UnresolvedResearchQuestion",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Top-level deterministic output boundary for Research Agent v0.1.",
+  "properties": {
+    "agent": {
+      "const": "research_agent",
+      "title": "Agent",
+      "type": "string"
+    },
+    "conflicts": {
+      "items": {
+        "$ref": "#/$defs/EvidenceConflict"
+      },
+      "title": "Conflicts",
+      "type": "array"
+    },
+    "contract_version": {
+      "const": "0.1",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "coverage": {
+      "items": {
+        "$ref": "#/$defs/ResearchCoverage"
+      },
+      "title": "Coverage",
+      "type": "array"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/ResearchFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "research_scope": {
+      "$ref": "#/$defs/ResearchScope"
+    },
+    "research_summary": {
+      "minLength": 1,
+      "title": "Research Summary",
+      "type": "string"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/EvidenceSource"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "unresolved_questions": {
+      "items": {
+        "$ref": "#/$defs/UnresolvedResearchQuestion"
+      },
+      "title": "Unresolved Questions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_version",
+    "agent",
+    "research_scope",
+    "sources",
+    "findings",
+    "conflicts",
+    "unresolved_questions",
+    "coverage",
+    "research_summary"
+  ],
+  "title": "ResearchEvidenceContract",
+  "type": "object"
+}
