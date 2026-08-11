@@ -232,3 +232,21 @@ def test_26_no_repair_or_retry_in_synthesis_pipeline():
     with pytest.raises(ValidationError):
         asyncio.run(synthesize_with_app(app, director(), registry()))
     assert app.calls == 1
+
+def test_27_acceptance_rejects_parameter_source_outside_parent_finding():
+    d = director(two_requirements=True)
+    r = registry(two_sources=True)
+    payload = candidate_payload(d, r)
+    source_a, source_b = list(r.sources_by_id)
+    payload["findings"][0]["source_ids"] = [source_a]
+    payload["findings"][0]["physical_parameters"] = [{
+        "name": "refractive_index",
+        "value_text": "1.5",
+        "source_ids": [source_b],
+        "unit": None,
+        "conditions": [],
+        "uncertainty": None,
+        "related_entity": "crystal_1",
+    }]
+    with pytest.raises(ValidationError, match="subset of parent ResearchFinding"):
+        accept_research_candidate(json.dumps(payload, default=str), d, r)

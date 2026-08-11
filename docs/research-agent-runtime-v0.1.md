@@ -19,3 +19,4 @@ There is no repair or retry. Zero-evidence searches remain in the packet; synthe
 ## Limits
 
 Provenance proves retrieval and metadata, not semantic claim-to-excerpt entailment. A future Physical Constraints Agent owns physical interpretation and final verdicts. This runtime does not browse, follow URLs, call other retrieval tools, resolve scientific truth, or perform scene planning.
+Structured model output can still violate semantic or cross-reference invariants, so explicit Pydantic validation remains mandatory. Each `PhysicalParameterEvidence.source_ids` list must remain within its parent finding's provenance. Material-specific parameter evidence cannot be transferred to another scene material unless the supplied Director context or evidence establishes material identity. These properties are enforced at the validation boundary, not guaranteed by the model.
