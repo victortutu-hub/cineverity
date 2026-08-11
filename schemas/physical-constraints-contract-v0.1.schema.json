@@ -1,0 +1,761 @@
+{
+  "$defs": {
+    "ArtisticDeviation": {
+      "additionalProperties": false,
+      "description": "An explicit artistic choice separate from physical assessment.",
+      "properties": {
+        "constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Constraint Ids",
+          "type": "array"
+        },
+        "deviation_type": {
+          "$ref": "#/$defs/ArtisticDeviationType"
+        },
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Scene Entity Ids",
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "physical_tradeoff": {
+          "minLength": 1,
+          "title": "Physical Tradeoff",
+          "type": "string"
+        },
+        "related_material_unknown_parameters": {
+          "items": {
+            "$ref": "#/$defs/MaterialUnknownParameterReference"
+          },
+          "title": "Related Material Unknown Parameters",
+          "type": "array"
+        },
+        "requires_explicit_artist_acceptance": {
+          "title": "Requires Explicit Artist Acceptance",
+          "type": "boolean"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "statement",
+        "deviation_type",
+        "director_physical_question_ids",
+        "director_scene_entity_ids",
+        "related_material_unknown_parameters",
+        "constraint_ids",
+        "physical_tradeoff",
+        "requires_explicit_artist_acceptance"
+      ],
+      "title": "ArtisticDeviation",
+      "type": "object"
+    },
+    "ArtisticDeviationType": {
+      "enum": [
+        "explicitly_nonphysical",
+        "artistic_amplification",
+        "speculative_behavior"
+      ],
+      "title": "ArtisticDeviationType",
+      "type": "string"
+    },
+    "EvidenceStatus": {
+      "enum": [
+        "supported",
+        "partially_supported",
+        "conflicting",
+        "unsupported",
+        "insufficient_evidence"
+      ],
+      "title": "EvidenceStatus",
+      "type": "string"
+    },
+    "MaterialIdentityReference": {
+      "additionalProperties": false,
+      "description": "Provenanced material-identity disposition for one scene entity.",
+      "properties": {
+        "identity_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Identity Label"
+        },
+        "limitation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Limitation"
+        },
+        "research_finding_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Research Finding Ids",
+          "type": "array"
+        },
+        "scene_entity_id": {
+          "minLength": 1,
+          "title": "Scene Entity Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/MaterialIdentityStatus"
+        }
+      },
+      "required": [
+        "scene_entity_id",
+        "status",
+        "research_finding_ids",
+        "source_ids"
+      ],
+      "title": "MaterialIdentityReference",
+      "type": "object"
+    },
+    "MaterialIdentityStatus": {
+      "description": "Whether evidence identity can be applied to the referenced scene entity.",
+      "enum": [
+        "established_for_scene_entity",
+        "contextual_only",
+        "unresolved"
+      ],
+      "title": "MaterialIdentityStatus",
+      "type": "string"
+    },
+    "MaterialUnknownParameterReference": {
+      "additionalProperties": false,
+      "description": "Identity pair for a material parameter left unknown by the Director.",
+      "properties": {
+        "entity_id": {
+          "minLength": 1,
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "parameter": {
+          "minLength": 1,
+          "title": "Parameter",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entity_id",
+        "parameter"
+      ],
+      "title": "MaterialUnknownParameterReference",
+      "type": "object"
+    },
+    "PhysicalAssessmentStatus": {
+      "description": "Physical assessment of a constraint, distinct from question coverage.",
+      "enum": [
+        "supported",
+        "conditionally_supported",
+        "conflicting",
+        "unsupported",
+        "indeterminate"
+      ],
+      "title": "PhysicalAssessmentStatus",
+      "type": "string"
+    },
+    "PhysicalConflict": {
+      "additionalProperties": false,
+      "description": "An explicit physical conflict, never a silent repair of Director intent.",
+      "properties": {
+        "conditions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Conditions",
+          "type": "array"
+        },
+        "constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Constraint Ids",
+          "type": "array"
+        },
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "research_conflict_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Research Conflict Ids",
+          "type": "array"
+        },
+        "research_finding_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Research Finding Ids",
+          "type": "array"
+        },
+        "resolution_status": {
+          "$ref": "#/$defs/PhysicalConflictResolutionStatus"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "statement",
+        "constraint_ids",
+        "director_physical_question_ids",
+        "research_finding_ids",
+        "source_ids",
+        "research_conflict_ids",
+        "conditions",
+        "limitations",
+        "resolution_status"
+      ],
+      "title": "PhysicalConflict",
+      "type": "object"
+    },
+    "PhysicalConflictResolutionStatus": {
+      "enum": [
+        "unresolved",
+        "context_dependent",
+        "artist_decision_required"
+      ],
+      "title": "PhysicalConflictResolutionStatus",
+      "type": "string"
+    },
+    "PhysicalConstraint": {
+      "additionalProperties": false,
+      "description": "A physically interpreted consequence with closed Research provenance.",
+      "properties": {
+        "conditions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Conditions",
+          "type": "array"
+        },
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_research_requirement_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Research Requirement Ids",
+          "type": "array"
+        },
+        "director_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Scene Entity Ids",
+          "type": "array"
+        },
+        "domain": {
+          "minLength": 1,
+          "title": "Domain",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "material_identity_references": {
+          "items": {
+            "$ref": "#/$defs/MaterialIdentityReference"
+          },
+          "title": "Material Identity References",
+          "type": "array"
+        },
+        "related_material_unknown_parameters": {
+          "items": {
+            "$ref": "#/$defs/MaterialUnknownParameterReference"
+          },
+          "title": "Related Material Unknown Parameters",
+          "type": "array"
+        },
+        "research_finding_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Research Finding Ids",
+          "type": "array"
+        },
+        "safe_downstream_assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Safe Downstream Assumptions",
+          "type": "array"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/PhysicalAssessmentStatus"
+        },
+        "unsafe_downstream_assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unsafe Downstream Assumptions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "statement",
+        "domain",
+        "status",
+        "director_physical_question_ids",
+        "director_research_requirement_ids",
+        "director_scene_entity_ids",
+        "related_material_unknown_parameters",
+        "research_finding_ids",
+        "source_ids",
+        "conditions",
+        "limitations",
+        "material_identity_references",
+        "safe_downstream_assumptions",
+        "unsafe_downstream_assumptions"
+      ],
+      "title": "PhysicalConstraint",
+      "type": "object"
+    },
+    "PhysicalConstraintsScope": {
+      "additionalProperties": false,
+      "description": "Authoritative input snapshot for internal Step 3.1 reference validation.",
+      "properties": {
+        "director_material_unknown_parameters": {
+          "items": {
+            "$ref": "#/$defs/MaterialUnknownParameterReference"
+          },
+          "title": "Director Material Unknown Parameters",
+          "type": "array"
+        },
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_research_requirement_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Research Requirement Ids",
+          "type": "array"
+        },
+        "director_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Scene Entity Ids",
+          "type": "array"
+        },
+        "director_validation_target_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Validation Target Ids",
+          "type": "array"
+        },
+        "research_conflict_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Research Conflict Ids",
+          "type": "array"
+        },
+        "research_finding_provenance": {
+          "items": {
+            "$ref": "#/$defs/ResearchFindingProvenanceReference"
+          },
+          "title": "Research Finding Provenance",
+          "type": "array"
+        },
+        "research_unresolved_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Research Unresolved Question Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "director_physical_question_ids",
+        "director_research_requirement_ids",
+        "director_scene_entity_ids",
+        "director_material_unknown_parameters",
+        "director_validation_target_ids",
+        "research_finding_provenance",
+        "research_conflict_ids",
+        "research_unresolved_question_ids"
+      ],
+      "title": "PhysicalConstraintsScope",
+      "type": "object"
+    },
+    "PhysicalQuestionCoverage": {
+      "additionalProperties": false,
+      "description": "Completion record for exactly one scoped Director physical question.",
+      "properties": {
+        "artistic_deviation_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Artistic Deviation Ids",
+          "type": "array"
+        },
+        "constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Constraint Ids",
+          "type": "array"
+        },
+        "director_physical_question_id": {
+          "minLength": 1,
+          "title": "Director Physical Question Id",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "state": {
+          "$ref": "#/$defs/PhysicalQuestionCoverageState"
+        },
+        "unresolved_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Constraint Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "director_physical_question_id",
+        "state",
+        "constraint_ids",
+        "unresolved_constraint_ids",
+        "artistic_deviation_ids"
+      ],
+      "title": "PhysicalQuestionCoverage",
+      "type": "object"
+    },
+    "PhysicalQuestionCoverageState": {
+      "description": "Whether a Director physical question has been answered by this contract.",
+      "enum": [
+        "addressed",
+        "partially_addressed",
+        "unresolved"
+      ],
+      "title": "PhysicalQuestionCoverageState",
+      "type": "string"
+    },
+    "Priority": {
+      "description": "Priority level for questions, research requirements, and constraints.",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "title": "Priority",
+      "type": "string"
+    },
+    "ResearchFindingProvenanceReference": {
+      "additionalProperties": false,
+      "description": "Minimal finding-to-source projection used for internal provenance validation.",
+      "properties": {
+        "evidence_status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "finding_id": {
+          "minLength": 1,
+          "title": "Finding Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "finding_id",
+        "source_ids",
+        "evidence_status"
+      ],
+      "title": "ResearchFindingProvenanceReference",
+      "type": "object"
+    },
+    "UnresolvedPhysicalConstraint": {
+      "additionalProperties": false,
+      "description": "A physical question that remains indeterminate without invented evidence.",
+      "properties": {
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Scene Entity Ids",
+          "type": "array"
+        },
+        "evidence_needed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Needed",
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "priority": {
+          "$ref": "#/$defs/Priority"
+        },
+        "related_material_unknown_parameters": {
+          "items": {
+            "$ref": "#/$defs/MaterialUnknownParameterReference"
+          },
+          "title": "Related Material Unknown Parameters",
+          "type": "array"
+        },
+        "research_conflict_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Research Conflict Ids",
+          "type": "array"
+        },
+        "research_finding_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Research Finding Ids",
+          "type": "array"
+        },
+        "research_unresolved_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Research Unresolved Question Ids",
+          "type": "array"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "why_indeterminate": {
+          "minLength": 1,
+          "title": "Why Indeterminate",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "why_indeterminate",
+        "evidence_needed",
+        "priority",
+        "director_physical_question_ids",
+        "director_scene_entity_ids",
+        "related_material_unknown_parameters",
+        "research_finding_ids",
+        "source_ids",
+        "research_conflict_ids",
+        "research_unresolved_question_ids",
+        "limitations"
+      ],
+      "title": "UnresolvedPhysicalConstraint",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Deterministic boundary between accepted evidence and downstream scene planning.",
+  "properties": {
+    "agent": {
+      "const": "physical_constraints_agent",
+      "title": "Agent",
+      "type": "string"
+    },
+    "artistic_deviations": {
+      "items": {
+        "$ref": "#/$defs/ArtisticDeviation"
+      },
+      "title": "Artistic Deviations",
+      "type": "array"
+    },
+    "conflicts": {
+      "items": {
+        "$ref": "#/$defs/PhysicalConflict"
+      },
+      "title": "Conflicts",
+      "type": "array"
+    },
+    "constraints": {
+      "items": {
+        "$ref": "#/$defs/PhysicalConstraint"
+      },
+      "title": "Constraints",
+      "type": "array"
+    },
+    "contract_version": {
+      "const": "0.1",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "coverage": {
+      "items": {
+        "$ref": "#/$defs/PhysicalQuestionCoverage"
+      },
+      "title": "Coverage",
+      "type": "array"
+    },
+    "input_scope": {
+      "$ref": "#/$defs/PhysicalConstraintsScope"
+    },
+    "physical_summary": {
+      "minLength": 1,
+      "title": "Physical Summary",
+      "type": "string"
+    },
+    "unresolved_constraints": {
+      "items": {
+        "$ref": "#/$defs/UnresolvedPhysicalConstraint"
+      },
+      "title": "Unresolved Constraints",
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_version",
+    "agent",
+    "input_scope",
+    "constraints",
+    "conflicts",
+    "unresolved_constraints",
+    "artistic_deviations",
+    "coverage",
+    "physical_summary"
+  ],
+  "title": "PhysicalConstraintsContract",
+  "type": "object"
+}
