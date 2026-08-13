@@ -1,0 +1,1264 @@
+{
+  "$defs": {
+    "ArtisticDeviationRealization": {
+      "additionalProperties": false,
+      "properties": {
+        "artistic_deviation_id": {
+          "minLength": 1,
+          "title": "Artistic Deviation Id",
+          "type": "string"
+        },
+        "decision_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Decision Ids",
+          "type": "array"
+        },
+        "dependency_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dependency Ids",
+          "type": "array"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "deviation_type": {
+          "$ref": "#/$defs/ArtisticDeviationType"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "requires_explicit_artist_acceptance": {
+          "title": "Requires Explicit Artist Acceptance",
+          "type": "boolean"
+        },
+        "status": {
+          "$ref": "#/$defs/SceneDecisionStatus"
+        },
+        "target_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Target Scene Entity Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "artistic_deviation_id",
+        "deviation_type",
+        "requires_explicit_artist_acceptance",
+        "target_scene_entity_ids",
+        "decision_ids",
+        "status",
+        "dependency_ids",
+        "description"
+      ],
+      "title": "ArtisticDeviationRealization",
+      "type": "object"
+    },
+    "ArtisticDeviationScopeReference": {
+      "additionalProperties": false,
+      "properties": {
+        "artistic_deviation_id": {
+          "minLength": 1,
+          "title": "Artistic Deviation Id",
+          "type": "string"
+        },
+        "deviation_type": {
+          "$ref": "#/$defs/ArtisticDeviationType"
+        },
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Scene Entity Ids",
+          "type": "array"
+        },
+        "related_material_unknown_parameters": {
+          "items": {
+            "$ref": "#/$defs/MaterialUnknownParameterReference"
+          },
+          "title": "Related Material Unknown Parameters",
+          "type": "array"
+        },
+        "requires_explicit_artist_acceptance": {
+          "title": "Requires Explicit Artist Acceptance",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "artistic_deviation_id",
+        "deviation_type",
+        "requires_explicit_artist_acceptance",
+        "director_scene_entity_ids",
+        "director_physical_question_ids",
+        "related_material_unknown_parameters"
+      ],
+      "title": "ArtisticDeviationScopeReference",
+      "type": "object"
+    },
+    "ArtisticDeviationType": {
+      "enum": [
+        "explicitly_nonphysical",
+        "artistic_amplification",
+        "speculative_behavior"
+      ],
+      "title": "ArtisticDeviationType",
+      "type": "string"
+    },
+    "MaterialIdentityStatus": {
+      "description": "Whether evidence identity can be applied to the referenced scene entity.",
+      "enum": [
+        "established_for_scene_entity",
+        "contextual_only",
+        "unresolved"
+      ],
+      "title": "MaterialIdentityStatus",
+      "type": "string"
+    },
+    "MaterialUnknownParameterReference": {
+      "additionalProperties": false,
+      "description": "Identity pair for a material parameter left unknown by the Director.",
+      "properties": {
+        "entity_id": {
+          "minLength": 1,
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "parameter": {
+          "minLength": 1,
+          "title": "Parameter",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entity_id",
+        "parameter"
+      ],
+      "title": "MaterialUnknownParameterReference",
+      "type": "object"
+    },
+    "PhysicalAssessmentStatus": {
+      "description": "Physical assessment of a constraint, distinct from question coverage.",
+      "enum": [
+        "supported",
+        "conditionally_supported",
+        "conflicting",
+        "unsupported",
+        "indeterminate"
+      ],
+      "title": "PhysicalAssessmentStatus",
+      "type": "string"
+    },
+    "PhysicalConflictResolutionStatus": {
+      "enum": [
+        "unresolved",
+        "context_dependent",
+        "artist_decision_required"
+      ],
+      "title": "PhysicalConflictResolutionStatus",
+      "type": "string"
+    },
+    "PhysicalConflictScopeReference": {
+      "additionalProperties": false,
+      "properties": {
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "physical_conflict_id": {
+          "minLength": 1,
+          "title": "Physical Conflict Id",
+          "type": "string"
+        },
+        "physical_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Physical Constraint Ids",
+          "type": "array"
+        },
+        "resolution_status": {
+          "$ref": "#/$defs/PhysicalConflictResolutionStatus"
+        }
+      },
+      "required": [
+        "physical_conflict_id",
+        "resolution_status",
+        "physical_constraint_ids",
+        "director_physical_question_ids"
+      ],
+      "title": "PhysicalConflictScopeReference",
+      "type": "object"
+    },
+    "PhysicalConstraintScopeReference": {
+      "additionalProperties": false,
+      "properties": {
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Scene Entity Ids",
+          "type": "array"
+        },
+        "physical_constraint_id": {
+          "minLength": 1,
+          "title": "Physical Constraint Id",
+          "type": "string"
+        },
+        "related_material_unknown_parameters": {
+          "items": {
+            "$ref": "#/$defs/MaterialUnknownParameterReference"
+          },
+          "title": "Related Material Unknown Parameters",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/PhysicalAssessmentStatus"
+        }
+      },
+      "required": [
+        "physical_constraint_id",
+        "status",
+        "director_scene_entity_ids",
+        "director_physical_question_ids",
+        "related_material_unknown_parameters"
+      ],
+      "title": "PhysicalConstraintScopeReference",
+      "type": "object"
+    },
+    "SceneCoverageState": {
+      "enum": [
+        "realized",
+        "constrains_decision",
+        "conditional",
+        "deferred"
+      ],
+      "title": "SceneCoverageState",
+      "type": "string"
+    },
+    "SceneCoverageSubjectKind": {
+      "enum": [
+        "physical_constraint",
+        "physical_conflict",
+        "unresolved_physical_constraint",
+        "artistic_deviation"
+      ],
+      "title": "SceneCoverageSubjectKind",
+      "type": "string"
+    },
+    "SceneDecisionBasis": {
+      "additionalProperties": false,
+      "properties": {
+        "artistic_deviation_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Artistic Deviation Ids",
+          "type": "array"
+        },
+        "constraining_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Constraining Constraint Ids",
+          "type": "array"
+        },
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "grounding_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Grounding Constraint Ids",
+          "type": "array"
+        },
+        "implementation_rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Implementation Rationale"
+        },
+        "physical_conflict_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Physical Conflict Ids",
+          "type": "array"
+        },
+        "unresolved_physical_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Physical Constraint Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "director_physical_question_ids",
+        "grounding_constraint_ids",
+        "constraining_constraint_ids",
+        "physical_conflict_ids",
+        "artistic_deviation_ids",
+        "unresolved_physical_constraint_ids"
+      ],
+      "title": "SceneDecisionBasis",
+      "type": "object"
+    },
+    "SceneDecisionKind": {
+      "enum": [
+        "physically_grounded_realization",
+        "implementation_choice",
+        "artistic_deviation_realization",
+        "unresolved_dependency_handling"
+      ],
+      "title": "SceneDecisionKind",
+      "type": "string"
+    },
+    "SceneDecisionStatus": {
+      "enum": [
+        "committed",
+        "conditional",
+        "deferred"
+      ],
+      "title": "SceneDecisionStatus",
+      "type": "string"
+    },
+    "SceneMaterialIdentityMode": {
+      "enum": [
+        "established",
+        "unresolved_abstract",
+        "provisional_placeholder"
+      ],
+      "title": "SceneMaterialIdentityMode",
+      "type": "string"
+    },
+    "SceneMaterialIdentityScopeReference": {
+      "additionalProperties": false,
+      "properties": {
+        "identity_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Identity Label"
+        },
+        "physical_constraint_id": {
+          "minLength": 1,
+          "title": "Physical Constraint Id",
+          "type": "string"
+        },
+        "scene_entity_id": {
+          "minLength": 1,
+          "title": "Scene Entity Id",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/MaterialIdentityStatus"
+        }
+      },
+      "required": [
+        "physical_constraint_id",
+        "scene_entity_id",
+        "status"
+      ],
+      "title": "SceneMaterialIdentityScopeReference",
+      "type": "object"
+    },
+    "SceneMaterialIdentitySelector": {
+      "additionalProperties": false,
+      "properties": {
+        "physical_constraint_id": {
+          "minLength": 1,
+          "title": "Physical Constraint Id",
+          "type": "string"
+        },
+        "scene_entity_id": {
+          "minLength": 1,
+          "title": "Scene Entity Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "physical_constraint_id",
+        "scene_entity_id"
+      ],
+      "title": "SceneMaterialIdentitySelector",
+      "type": "object"
+    },
+    "SceneMaterialPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "decision_id": {
+          "minLength": 1,
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "dependency_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dependency Ids",
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "identity_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Identity Label"
+        },
+        "identity_mode": {
+          "$ref": "#/$defs/SceneMaterialIdentityMode"
+        },
+        "limitation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Limitation"
+        },
+        "material_identity_selector": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SceneMaterialIdentitySelector"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "scene_entity_id": {
+          "minLength": 1,
+          "title": "Scene Entity Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "decision_id",
+        "scene_entity_id",
+        "identity_mode",
+        "dependency_ids"
+      ],
+      "title": "SceneMaterialPlan",
+      "type": "object"
+    },
+    "SceneParameterAssignment": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "$ref": "#/$defs/SceneParameterCategory"
+        },
+        "decision_id": {
+          "minLength": 1,
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "dependency_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dependency Ids",
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "parameter_name": {
+          "minLength": 1,
+          "title": "Parameter Name",
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/SceneParameterRole"
+        },
+        "target_scene_entity_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Scene Entity Id"
+        },
+        "value": {
+          "$ref": "#/$defs/SceneParameterValue"
+        }
+      },
+      "required": [
+        "id",
+        "decision_id",
+        "parameter_name",
+        "category",
+        "role",
+        "value",
+        "dependency_ids"
+      ],
+      "title": "SceneParameterAssignment",
+      "type": "object"
+    },
+    "SceneParameterCategory": {
+      "enum": [
+        "geometry",
+        "material",
+        "lighting",
+        "camera",
+        "environment",
+        "temporal"
+      ],
+      "title": "SceneParameterCategory",
+      "type": "string"
+    },
+    "SceneParameterRole": {
+      "enum": [
+        "implementation_choice",
+        "artistic_realization",
+        "provisional_placeholder",
+        "unresolved"
+      ],
+      "title": "SceneParameterRole",
+      "type": "string"
+    },
+    "SceneParameterValue": {
+      "additionalProperties": false,
+      "properties": {
+        "boolean_value": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Boolean Value"
+        },
+        "categorical_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Categorical Value"
+        },
+        "descriptive_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Descriptive Value"
+        },
+        "kind": {
+          "$ref": "#/$defs/SceneParameterValueKind"
+        },
+        "numeric_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Numeric Value"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "SceneParameterValue",
+      "type": "object"
+    },
+    "SceneParameterValueKind": {
+      "enum": [
+        "numeric",
+        "categorical",
+        "descriptive",
+        "boolean",
+        "unresolved"
+      ],
+      "title": "SceneParameterValueKind",
+      "type": "string"
+    },
+    "ScenePlanDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "$ref": "#/$defs/SceneDecisionBasis"
+        },
+        "conditions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Conditions",
+          "type": "array"
+        },
+        "dependency_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dependency Ids",
+          "type": "array"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/SceneDecisionKind"
+        },
+        "status": {
+          "$ref": "#/$defs/SceneDecisionStatus"
+        },
+        "target_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Target Scene Entity Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "status",
+        "description",
+        "target_scene_entity_ids",
+        "basis",
+        "conditions",
+        "dependency_ids"
+      ],
+      "title": "ScenePlanDecision",
+      "type": "object"
+    },
+    "ScenePlanningCoverage": {
+      "additionalProperties": false,
+      "properties": {
+        "decision_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Decision Ids",
+          "type": "array"
+        },
+        "dependency_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dependency Ids",
+          "type": "array"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "state": {
+          "$ref": "#/$defs/SceneCoverageState"
+        },
+        "subject_id": {
+          "minLength": 1,
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "subject_kind": {
+          "$ref": "#/$defs/SceneCoverageSubjectKind"
+        },
+        "validation_hook_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Validation Hook Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "subject_kind",
+        "subject_id",
+        "state",
+        "decision_ids",
+        "dependency_ids",
+        "validation_hook_ids"
+      ],
+      "title": "ScenePlanningCoverage",
+      "type": "object"
+    },
+    "ScenePlanningDependency": {
+      "additionalProperties": false,
+      "properties": {
+        "artistic_deviation_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Artistic Deviation Id"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ScenePlanningDependencyKind"
+        },
+        "material_identity_selector": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SceneMaterialIdentitySelector"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "physical_conflict_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Physical Conflict Id"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "unresolved_physical_constraint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unresolved Physical Constraint Id"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "reason"
+      ],
+      "title": "ScenePlanningDependency",
+      "type": "object"
+    },
+    "ScenePlanningDependencyKind": {
+      "enum": [
+        "unresolved_physical_constraint",
+        "physical_conflict",
+        "material_identity_uncertainty",
+        "artist_acceptance",
+        "artist_decision"
+      ],
+      "title": "ScenePlanningDependencyKind",
+      "type": "string"
+    },
+    "ScenePlanningScope": {
+      "additionalProperties": false,
+      "properties": {
+        "artistic_deviation_references": {
+          "items": {
+            "$ref": "#/$defs/ArtisticDeviationScopeReference"
+          },
+          "title": "Artistic Deviation References",
+          "type": "array"
+        },
+        "director_contract_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Director Contract Sha256",
+          "type": "string"
+        },
+        "director_material_unknown_parameters": {
+          "items": {
+            "$ref": "#/$defs/MaterialUnknownParameterReference"
+          },
+          "title": "Director Material Unknown Parameters",
+          "type": "array"
+        },
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Scene Entity Ids",
+          "type": "array"
+        },
+        "director_validation_target_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Validation Target Ids",
+          "type": "array"
+        },
+        "material_identity_references": {
+          "items": {
+            "$ref": "#/$defs/SceneMaterialIdentityScopeReference"
+          },
+          "title": "Material Identity References",
+          "type": "array"
+        },
+        "physical_conflict_references": {
+          "items": {
+            "$ref": "#/$defs/PhysicalConflictScopeReference"
+          },
+          "title": "Physical Conflict References",
+          "type": "array"
+        },
+        "physical_constraint_references": {
+          "items": {
+            "$ref": "#/$defs/PhysicalConstraintScopeReference"
+          },
+          "title": "Physical Constraint References",
+          "type": "array"
+        },
+        "physical_constraints_contract_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Physical Constraints Contract Sha256",
+          "type": "string"
+        },
+        "unresolved_physical_constraint_references": {
+          "items": {
+            "$ref": "#/$defs/UnresolvedPhysicalConstraintScopeReference"
+          },
+          "title": "Unresolved Physical Constraint References",
+          "type": "array"
+        }
+      },
+      "required": [
+        "director_contract_sha256",
+        "physical_constraints_contract_sha256",
+        "director_scene_entity_ids",
+        "director_validation_target_ids",
+        "director_physical_question_ids",
+        "director_material_unknown_parameters",
+        "physical_constraint_references",
+        "physical_conflict_references",
+        "unresolved_physical_constraint_references",
+        "artistic_deviation_references",
+        "material_identity_references"
+      ],
+      "title": "ScenePlanningScope",
+      "type": "object"
+    },
+    "SceneShotPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "decision_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Decision Ids",
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "purpose": {
+          "minLength": 1,
+          "title": "Purpose",
+          "type": "string"
+        },
+        "sequence_index": {
+          "minimum": 0,
+          "title": "Sequence Index",
+          "type": "integer"
+        },
+        "temporal_beats": {
+          "items": {
+            "$ref": "#/$defs/TemporalBeat"
+          },
+          "title": "Temporal Beats",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "sequence_index",
+        "purpose",
+        "decision_ids",
+        "temporal_beats"
+      ],
+      "title": "SceneShotPlan",
+      "type": "object"
+    },
+    "SceneValidationHook": {
+      "additionalProperties": false,
+      "properties": {
+        "artistic_deviation_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Artistic Deviation Ids",
+          "type": "array"
+        },
+        "decision_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Decision Ids",
+          "type": "array"
+        },
+        "dependency_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dependency Ids",
+          "type": "array"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "director_validation_target_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Validation Target Ids",
+          "type": "array"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/SceneValidationHookKind"
+        },
+        "physical_conflict_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Physical Conflict Ids",
+          "type": "array"
+        },
+        "physical_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Physical Constraint Ids",
+          "type": "array"
+        },
+        "unresolved_physical_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Physical Constraint Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "description",
+        "decision_ids",
+        "dependency_ids",
+        "director_validation_target_ids",
+        "physical_constraint_ids",
+        "artistic_deviation_ids",
+        "unresolved_physical_constraint_ids",
+        "physical_conflict_ids"
+      ],
+      "title": "SceneValidationHook",
+      "type": "object"
+    },
+    "SceneValidationHookKind": {
+      "enum": [
+        "director_target_check",
+        "physical_constraint_check",
+        "artistic_deviation_disclosure_check",
+        "unresolved_dependency_check",
+        "physical_conflict_check"
+      ],
+      "title": "SceneValidationHookKind",
+      "type": "string"
+    },
+    "TemporalBeat": {
+      "additionalProperties": false,
+      "properties": {
+        "decision_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Decision Ids",
+          "type": "array"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "sequence_index": {
+          "minimum": 0,
+          "title": "Sequence Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "sequence_index",
+        "description",
+        "decision_ids"
+      ],
+      "title": "TemporalBeat",
+      "type": "object"
+    },
+    "UnresolvedPhysicalConstraintScopeReference": {
+      "additionalProperties": false,
+      "properties": {
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Scene Entity Ids",
+          "type": "array"
+        },
+        "related_material_unknown_parameters": {
+          "items": {
+            "$ref": "#/$defs/MaterialUnknownParameterReference"
+          },
+          "title": "Related Material Unknown Parameters",
+          "type": "array"
+        },
+        "unresolved_physical_constraint_id": {
+          "minLength": 1,
+          "title": "Unresolved Physical Constraint Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "unresolved_physical_constraint_id",
+        "director_scene_entity_ids",
+        "director_physical_question_ids",
+        "related_material_unknown_parameters"
+      ],
+      "title": "UnresolvedPhysicalConstraintScopeReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "agent": {
+      "const": "scene_planning_agent",
+      "title": "Agent",
+      "type": "string"
+    },
+    "artistic_deviation_realizations": {
+      "items": {
+        "$ref": "#/$defs/ArtisticDeviationRealization"
+      },
+      "title": "Artistic Deviation Realizations",
+      "type": "array"
+    },
+    "contract_version": {
+      "const": "0.1",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "coverage": {
+      "items": {
+        "$ref": "#/$defs/ScenePlanningCoverage"
+      },
+      "title": "Coverage",
+      "type": "array"
+    },
+    "decisions": {
+      "items": {
+        "$ref": "#/$defs/ScenePlanDecision"
+      },
+      "title": "Decisions",
+      "type": "array"
+    },
+    "dependencies": {
+      "items": {
+        "$ref": "#/$defs/ScenePlanningDependency"
+      },
+      "title": "Dependencies",
+      "type": "array"
+    },
+    "input_scope": {
+      "$ref": "#/$defs/ScenePlanningScope"
+    },
+    "material_plans": {
+      "items": {
+        "$ref": "#/$defs/SceneMaterialPlan"
+      },
+      "title": "Material Plans",
+      "type": "array"
+    },
+    "parameter_assignments": {
+      "items": {
+        "$ref": "#/$defs/SceneParameterAssignment"
+      },
+      "title": "Parameter Assignments",
+      "type": "array"
+    },
+    "scene_plan_summary": {
+      "minLength": 1,
+      "title": "Scene Plan Summary",
+      "type": "string"
+    },
+    "shot_plan": {
+      "items": {
+        "$ref": "#/$defs/SceneShotPlan"
+      },
+      "title": "Shot Plan",
+      "type": "array"
+    },
+    "validation_hooks": {
+      "items": {
+        "$ref": "#/$defs/SceneValidationHook"
+      },
+      "title": "Validation Hooks",
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_version",
+    "agent",
+    "input_scope",
+    "decisions",
+    "parameter_assignments",
+    "material_plans",
+    "dependencies",
+    "artistic_deviation_realizations",
+    "shot_plan",
+    "validation_hooks",
+    "coverage",
+    "scene_plan_summary"
+  ],
+  "title": "ScenePlanningContract",
+  "type": "object"
+}
