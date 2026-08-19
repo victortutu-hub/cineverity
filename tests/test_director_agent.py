@@ -241,7 +241,7 @@ def test_12_runner_initializes_vertex_with_default_global_location_before_agent_
     """Runner configures Vertex AI locally before importing the Director runtime."""
     import scripts.run_director_agent as runner
 
-    monkeypatch.delenv("GOOGLE_CLOUD_PROJECT", raising=False)
+    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "test-project")
     monkeypatch.delenv("GOOGLE_CLOUD_LOCATION", raising=False)
     monkeypatch.delenv("GOOGLE_GENAI_USE_ENTERPRISE", raising=False)
     monkeypatch.delenv("CINEVERITY_GEMINI_MODEL", raising=False)
@@ -271,7 +271,7 @@ def test_12_runner_initializes_vertex_with_default_global_location_before_agent_
     assert os.environ["GOOGLE_CLOUD_LOCATION"] == "global"
     assert init_calls == [
         {
-            "project": "cineverity-hackathon-2026",
+            "project": "test-project",
             "location": "global",
         }
     ]

@@ -32,7 +32,7 @@ def test_2_runner_initializes_vertex_before_research_agent_import(monkeypatch, s
     runner = runner_module()
     events = []
 
-    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "cineverity-hackathon-2026")
+    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "test-project")
     monkeypatch.setenv("GOOGLE_GENAI_USE_ENTERPRISE", "True")
     monkeypatch.setenv("CINEVERITY_GEMINI_MODEL", "gemini-3.5-flash")
     if supplied_location is None:
@@ -60,7 +60,7 @@ def test_2_runner_initializes_vertex_before_research_agent_import(monkeypatch, s
         asyncio.run(runner.run_research(runner.Path("unused.json")))
 
     assert events == [
-        ("vertexai.init", "cineverity-hackathon-2026", expected_location),
+        ("vertexai.init", "test-project", expected_location),
         ("research_agent_import",),
     ]
     assert runner.os.environ["GOOGLE_CLOUD_LOCATION"] == expected_location

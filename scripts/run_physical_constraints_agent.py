@@ -23,6 +23,13 @@ def get_env_setting(name: str, default: str) -> str:
     return value
 
 
+def require_env_setting(name: str) -> str:
+    """Return a required environment setting without a project fallback."""
+    value = os.getenv(name)
+    if not value:
+        raise SystemExit(f"{name} must be set.")
+    return value
+
 def emit_physical_constraints_json(json_text: str) -> None:
     """Emit contract JSON through UTF-8 stdout without changing its content."""
     if hasattr(sys.stdout, "reconfigure"):
@@ -31,7 +38,7 @@ def emit_physical_constraints_json(json_text: str) -> None:
 
 
 async def run_physical_constraints(director_contract_path: Path, research_contract_path: Path) -> None:
-    project = get_env_setting("GOOGLE_CLOUD_PROJECT", "cineverity-hackathon-2026")
+    project = require_env_setting("GOOGLE_CLOUD_PROJECT")
     location = get_env_setting("GOOGLE_CLOUD_LOCATION", "global")
     enterprise = get_env_setting("GOOGLE_GENAI_USE_ENTERPRISE", "True")
     get_env_setting("CINEVERITY_GEMINI_MODEL", "gemini-3.5-flash")

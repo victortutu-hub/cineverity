@@ -8,7 +8,10 @@ from types import SimpleNamespace
 
 import pytest
 
-
+@pytest.fixture(autouse=True)
+def configured_google_project(monkeypatch):
+    """Keep runner-flow tests focused beyond the required-project preflight."""
+    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "test-project")
 def runner_module():
     return importlib.import_module("scripts.run_validation_readiness_agent")
 
@@ -27,7 +30,7 @@ def test_1_emit_json_reconfigures_stdout_as_utf8_without_mutation(monkeypatch):
 @pytest.mark.parametrize(("location", "expected"), [(None, "global"), ("europe-west4", "europe-west4")])
 def test_2_vertex_initializes_before_lazy_agent_import(monkeypatch, location, expected):
     runner = runner_module(); events = []
-    monkeypatch.delenv("GOOGLE_CLOUD_PROJECT", raising=False)
+    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "test-project")
     monkeypatch.delenv("CINEVERITY_GEMINI_MODEL", raising=False)
     monkeypatch.setenv("GOOGLE_GENAI_USE_ENTERPRISE", "True")
     if location is None: monkeypatch.delenv("GOOGLE_CLOUD_LOCATION", raising=False)
@@ -42,7 +45,7 @@ def test_2_vertex_initializes_before_lazy_agent_import(monkeypatch, location, ex
     monkeypatch.setattr(builtins, "__import__", tracked_import)
     with pytest.raises(StopAtAgentImport):
         asyncio.run(runner.run_validation_readiness(runner.Path("a.json"), runner.Path("b.json"), runner.Path("c.json")))
-    assert events == [("vertexai.init", "cineverity-hackathon-2026", expected), ("agent_import",)]
+    assert events == [("vertexai.init", "test-project", expected), ("agent_import",)]
     assert runner.os.environ["GOOGLE_CLOUD_LOCATION"] == expected
     assert runner.os.environ["CINEVERITY_GEMINI_MODEL"] == "gemini-3.5-flash"
 

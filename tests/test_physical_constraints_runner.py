@@ -11,7 +11,10 @@ import pytest
 
 from tests.test_physical_constraints_runtime import candidate_payload, director, research
 
-
+@pytest.fixture(autouse=True)
+def configured_google_project(monkeypatch):
+    """Keep runner-flow tests focused beyond the required-project preflight."""
+    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "test-project")
 def runner_module():
     return importlib.import_module("scripts.run_physical_constraints_agent")
 
@@ -29,7 +32,7 @@ def test_1_emit_json_reconfigures_stdout_as_utf8_without_mutation(monkeypatch):
 @pytest.mark.parametrize(("supplied_location", "expected_location"), [(None, "global"), ("europe-west4", "europe-west4")])
 def test_2_runner_initializes_vertex_before_agent_import(monkeypatch, supplied_location, expected_location):
     runner = runner_module(); events = []
-    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "cineverity-hackathon-2026")
+    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "test-project")
     monkeypatch.setenv("GOOGLE_GENAI_USE_ENTERPRISE", "True")
     monkeypatch.setenv("CINEVERITY_GEMINI_MODEL", "gemini-3.5-flash")
     if supplied_location is None: monkeypatch.delenv("GOOGLE_CLOUD_LOCATION", raising=False)
@@ -44,7 +47,7 @@ def test_2_runner_initializes_vertex_before_agent_import(monkeypatch, supplied_l
     monkeypatch.setattr(builtins, "__import__", tracked_import)
     with pytest.raises(StopAtAgentImport):
         asyncio.run(runner.run_physical_constraints(runner.Path("missing-director.json"), runner.Path("missing-research.json")))
-    assert events == [("vertexai.init", "cineverity-hackathon-2026", expected_location), ("agent_import",)]
+    assert events == [("vertexai.init", "test-project", expected_location), ("agent_import",)]
     assert runner.os.environ["GOOGLE_CLOUD_LOCATION"] == expected_location
 
 

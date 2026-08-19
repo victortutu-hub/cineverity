@@ -38,9 +38,25 @@ def get_env_setting(name: str, default: str) -> str:
     return val
 
 
-async def run_director(prompt: str) -> None:
+def require_env_setting(name: str) -> str:
+    """Return a required environment setting without a project fallback."""
+    value = os.getenv(name)
+    if not value:
+        raise SystemExit(f"{name} must be set.")
+    return value
+
+def write_accepted_director_contract(contract: object, output_path: Path) -> None:
+    """Write only an already-validated Director contract as UTF-8 JSON."""
+    try:
+        output_path.write_text(contract.model_dump_json(indent=2), encoding="utf-8")
+    except OSError as err:
+        raise RuntimeError(
+            f"Could not write accepted Director contract to {output_path}: {err}"
+        ) from err
+
+async def run_director(prompt: str, output_path: Path | None = None) -> None:
     """Execute Director Agent query and validate output boundary."""
-    project_id = get_env_setting("GOOGLE_CLOUD_PROJECT", "cineverity-hackathon-2026")
+    project_id = require_env_setting("GOOGLE_CLOUD_PROJECT")
     location = get_env_setting("GOOGLE_CLOUD_LOCATION", "global")
     enterprise = get_env_setting("GOOGLE_GENAI_USE_ENTERPRISE", "True")
     model = get_env_setting("CINEVERITY_GEMINI_MODEL", "gemini-3.5-flash")
@@ -78,6 +94,9 @@ async def run_director(prompt: str) -> None:
     print("Validating model output against DirectorIntentContract schema boundary...")
     validated_contract = validate_director_response(raw_text)
 
+    if output_path is not None:
+        write_accepted_director_contract(validated_contract, output_path)
+
     print("-" * 64)
     print("Validated Cinematic Intent Contract:")
     print(validated_contract.model_dump_json(indent=2))
@@ -98,10 +117,15 @@ def main() -> None:
         action="store_true",
         help="Run the preset adversarial test prompt.",
     )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        help="Write the accepted DirectorIntentContract JSON artifact to this path.",
+    )
     args = parser.parse_args()
 
     prompt = ADVERSARIAL_PROMPT if args.adversarial else args.prompt
-    asyncio.run(run_director(prompt))
+    asyncio.run(run_director(prompt, args.output))
 
 
 if __name__ == "__main__":
