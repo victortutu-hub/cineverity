@@ -1,0 +1,773 @@
+{
+  "$defs": {
+    "ArtisticDeviationType": {
+      "enum": [
+        "explicitly_nonphysical",
+        "artistic_amplification",
+        "speculative_behavior"
+      ],
+      "title": "ArtisticDeviationType",
+      "type": "string"
+    },
+    "PhysicalAssessmentStatus": {
+      "description": "Physical assessment of a constraint, distinct from question coverage.",
+      "enum": [
+        "supported",
+        "conditionally_supported",
+        "conflicting",
+        "unsupported",
+        "indeterminate"
+      ],
+      "title": "PhysicalAssessmentStatus",
+      "type": "string"
+    },
+    "PhysicalConflictResolutionStatus": {
+      "enum": [
+        "unresolved",
+        "context_dependent",
+        "artist_decision_required"
+      ],
+      "title": "PhysicalConflictResolutionStatus",
+      "type": "string"
+    },
+    "SceneValidationHookKind": {
+      "enum": [
+        "director_target_check",
+        "physical_constraint_check",
+        "artistic_deviation_disclosure_check",
+        "unresolved_dependency_check",
+        "physical_conflict_check"
+      ],
+      "title": "SceneValidationHookKind",
+      "type": "string"
+    },
+    "ValidationArtisticDeviationReference": {
+      "additionalProperties": false,
+      "properties": {
+        "artistic_deviation_id": {
+          "minLength": 1,
+          "title": "Artistic Deviation Id",
+          "type": "string"
+        },
+        "deviation_type": {
+          "$ref": "#/$defs/ArtisticDeviationType"
+        },
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Scene Entity Ids",
+          "type": "array"
+        },
+        "requires_explicit_artist_acceptance": {
+          "title": "Requires Explicit Artist Acceptance",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "artistic_deviation_id",
+        "deviation_type",
+        "requires_explicit_artist_acceptance",
+        "director_scene_entity_ids",
+        "director_physical_question_ids"
+      ],
+      "title": "ValidationArtisticDeviationReference",
+      "type": "object"
+    },
+    "ValidationDependencyCoverage": {
+      "additionalProperties": false,
+      "properties": {
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "prerequisites": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Prerequisites",
+          "type": "array"
+        },
+        "scene_dependency_id": {
+          "minLength": 1,
+          "title": "Scene Dependency Id",
+          "type": "string"
+        },
+        "validation_hook_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Validation Hook Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "scene_dependency_id",
+        "validation_hook_ids",
+        "prerequisites",
+        "limitations"
+      ],
+      "title": "ValidationDependencyCoverage",
+      "type": "object"
+    },
+    "ValidationDependencyReference": {
+      "additionalProperties": false,
+      "description": "A dependency plus authoritative Scene Planning hook bindings.",
+      "properties": {
+        "scene_dependency_id": {
+          "minLength": 1,
+          "title": "Scene Dependency Id",
+          "type": "string"
+        },
+        "validation_hook_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Validation Hook Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "scene_dependency_id",
+        "validation_hook_ids"
+      ],
+      "title": "ValidationDependencyReference",
+      "type": "object"
+    },
+    "ValidationExecutionState": {
+      "enum": [
+        "not_required",
+        "not_executed",
+        "unavailable"
+      ],
+      "title": "ValidationExecutionState",
+      "type": "string"
+    },
+    "ValidationHookReadiness": {
+      "additionalProperties": false,
+      "properties": {
+        "artistic_deviation_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Artistic Deviation Ids",
+          "type": "array"
+        },
+        "dependency_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dependency Ids",
+          "type": "array"
+        },
+        "director_validation_target_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Validation Target Ids",
+          "type": "array"
+        },
+        "execution_state": {
+          "$ref": "#/$defs/ValidationExecutionState"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "physical_conflict_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Physical Conflict Ids",
+          "type": "array"
+        },
+        "physical_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Physical Constraint Ids",
+          "type": "array"
+        },
+        "prerequisites": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Prerequisites",
+          "type": "array"
+        },
+        "scene_validation_hook_id": {
+          "minLength": 1,
+          "title": "Scene Validation Hook Id",
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/$defs/ValidationReadinessState"
+        },
+        "unresolved_physical_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Physical Constraint Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "scene_validation_hook_id",
+        "state",
+        "execution_state",
+        "director_validation_target_ids",
+        "physical_constraint_ids",
+        "physical_conflict_ids",
+        "unresolved_physical_constraint_ids",
+        "artistic_deviation_ids",
+        "dependency_ids",
+        "prerequisites",
+        "limitations"
+      ],
+      "title": "ValidationHookReadiness",
+      "type": "object"
+    },
+    "ValidationHookReference": {
+      "additionalProperties": false,
+      "properties": {
+        "artistic_deviation_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Artistic Deviation Ids",
+          "type": "array"
+        },
+        "dependency_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dependency Ids",
+          "type": "array"
+        },
+        "director_validation_target_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Validation Target Ids",
+          "type": "array"
+        },
+        "kind": {
+          "$ref": "#/$defs/SceneValidationHookKind"
+        },
+        "physical_conflict_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Physical Conflict Ids",
+          "type": "array"
+        },
+        "physical_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Physical Constraint Ids",
+          "type": "array"
+        },
+        "scene_validation_hook_id": {
+          "minLength": 1,
+          "title": "Scene Validation Hook Id",
+          "type": "string"
+        },
+        "unresolved_physical_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Physical Constraint Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "scene_validation_hook_id",
+        "kind",
+        "director_validation_target_ids",
+        "physical_constraint_ids",
+        "physical_conflict_ids",
+        "unresolved_physical_constraint_ids",
+        "artistic_deviation_ids",
+        "dependency_ids"
+      ],
+      "title": "ValidationHookReference",
+      "type": "object"
+    },
+    "ValidationPhysicalConflictReference": {
+      "additionalProperties": false,
+      "properties": {
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "physical_conflict_id": {
+          "minLength": 1,
+          "title": "Physical Conflict Id",
+          "type": "string"
+        },
+        "physical_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Physical Constraint Ids",
+          "type": "array"
+        },
+        "resolution_status": {
+          "$ref": "#/$defs/PhysicalConflictResolutionStatus"
+        }
+      },
+      "required": [
+        "physical_conflict_id",
+        "resolution_status",
+        "physical_constraint_ids",
+        "director_physical_question_ids"
+      ],
+      "title": "ValidationPhysicalConflictReference",
+      "type": "object"
+    },
+    "ValidationPhysicalConstraintReference": {
+      "additionalProperties": false,
+      "properties": {
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Scene Entity Ids",
+          "type": "array"
+        },
+        "physical_constraint_id": {
+          "minLength": 1,
+          "title": "Physical Constraint Id",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/PhysicalAssessmentStatus"
+        }
+      },
+      "required": [
+        "physical_constraint_id",
+        "status",
+        "director_scene_entity_ids",
+        "director_physical_question_ids"
+      ],
+      "title": "ValidationPhysicalConstraintReference",
+      "type": "object"
+    },
+    "ValidationReadinessScope": {
+      "additionalProperties": false,
+      "properties": {
+        "artistic_deviation_references": {
+          "items": {
+            "$ref": "#/$defs/ValidationArtisticDeviationReference"
+          },
+          "title": "Artistic Deviation References",
+          "type": "array"
+        },
+        "director_contract_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Director Contract Sha256",
+          "type": "string"
+        },
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Scene Entity Ids",
+          "type": "array"
+        },
+        "director_validation_target_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Validation Target Ids",
+          "type": "array"
+        },
+        "physical_conflict_references": {
+          "items": {
+            "$ref": "#/$defs/ValidationPhysicalConflictReference"
+          },
+          "title": "Physical Conflict References",
+          "type": "array"
+        },
+        "physical_constraint_references": {
+          "items": {
+            "$ref": "#/$defs/ValidationPhysicalConstraintReference"
+          },
+          "title": "Physical Constraint References",
+          "type": "array"
+        },
+        "physical_constraints_contract_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Physical Constraints Contract Sha256",
+          "type": "string"
+        },
+        "scene_dependency_references": {
+          "items": {
+            "$ref": "#/$defs/ValidationDependencyReference"
+          },
+          "title": "Scene Dependency References",
+          "type": "array"
+        },
+        "scene_planning_contract_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Scene Planning Contract Sha256",
+          "type": "string"
+        },
+        "scene_validation_hook_references": {
+          "items": {
+            "$ref": "#/$defs/ValidationHookReference"
+          },
+          "title": "Scene Validation Hook References",
+          "type": "array"
+        },
+        "unresolved_physical_constraint_references": {
+          "items": {
+            "$ref": "#/$defs/ValidationUnresolvedReference"
+          },
+          "title": "Unresolved Physical Constraint References",
+          "type": "array"
+        }
+      },
+      "required": [
+        "director_contract_sha256",
+        "physical_constraints_contract_sha256",
+        "scene_planning_contract_sha256",
+        "director_validation_target_ids",
+        "director_scene_entity_ids",
+        "director_physical_question_ids",
+        "physical_constraint_references",
+        "physical_conflict_references",
+        "unresolved_physical_constraint_references",
+        "artistic_deviation_references",
+        "scene_validation_hook_references",
+        "scene_dependency_references"
+      ],
+      "title": "ValidationReadinessScope",
+      "type": "object"
+    },
+    "ValidationReadinessState": {
+      "enum": [
+        "structurally_checkable",
+        "ready_for_execution",
+        "blocked",
+        "cannot_validate_yet"
+      ],
+      "title": "ValidationReadinessState",
+      "type": "string"
+    },
+    "ValidationRequirementClass": {
+      "enum": [
+        "contract_preflight",
+        "renderer_execution",
+        "simulation_execution",
+        "measurement",
+        "external_scientific_verification"
+      ],
+      "title": "ValidationRequirementClass",
+      "type": "string"
+    },
+    "ValidationSubjectKind": {
+      "enum": [
+        "physical_constraint",
+        "physical_conflict",
+        "unresolved_physical_constraint",
+        "artistic_deviation"
+      ],
+      "title": "ValidationSubjectKind",
+      "type": "string"
+    },
+    "ValidationSubjectReadiness": {
+      "additionalProperties": false,
+      "properties": {
+        "dependency_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dependency Ids",
+          "type": "array"
+        },
+        "director_validation_target_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Validation Target Ids",
+          "type": "array"
+        },
+        "execution_state": {
+          "$ref": "#/$defs/ValidationExecutionState"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "prerequisites": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Prerequisites",
+          "type": "array"
+        },
+        "state": {
+          "$ref": "#/$defs/ValidationReadinessState"
+        },
+        "subject_id": {
+          "minLength": 1,
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "subject_kind": {
+          "$ref": "#/$defs/ValidationSubjectKind"
+        },
+        "validation_hook_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Validation Hook Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "subject_kind",
+        "subject_id",
+        "state",
+        "execution_state",
+        "director_validation_target_ids",
+        "validation_hook_ids",
+        "dependency_ids",
+        "prerequisites",
+        "limitations"
+      ],
+      "title": "ValidationSubjectReadiness",
+      "type": "object"
+    },
+    "ValidationTargetReadiness": {
+      "additionalProperties": false,
+      "properties": {
+        "artistic_deviation_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Artistic Deviation Ids",
+          "type": "array"
+        },
+        "dependency_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dependency Ids",
+          "type": "array"
+        },
+        "director_validation_target_id": {
+          "minLength": 1,
+          "title": "Director Validation Target Id",
+          "type": "string"
+        },
+        "execution_state": {
+          "$ref": "#/$defs/ValidationExecutionState"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "physical_conflict_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Physical Conflict Ids",
+          "type": "array"
+        },
+        "physical_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Physical Constraint Ids",
+          "type": "array"
+        },
+        "prerequisites": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Prerequisites",
+          "type": "array"
+        },
+        "state": {
+          "$ref": "#/$defs/ValidationReadinessState"
+        },
+        "unresolved_physical_constraint_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Physical Constraint Ids",
+          "type": "array"
+        },
+        "validation_hook_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Validation Hook Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "director_validation_target_id",
+        "state",
+        "execution_state",
+        "validation_hook_ids",
+        "physical_constraint_ids",
+        "physical_conflict_ids",
+        "unresolved_physical_constraint_ids",
+        "artistic_deviation_ids",
+        "dependency_ids",
+        "prerequisites",
+        "limitations"
+      ],
+      "title": "ValidationTargetReadiness",
+      "type": "object"
+    },
+    "ValidationUnresolvedReference": {
+      "additionalProperties": false,
+      "properties": {
+        "director_physical_question_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Physical Question Ids",
+          "type": "array"
+        },
+        "director_scene_entity_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Director Scene Entity Ids",
+          "type": "array"
+        },
+        "unresolved_physical_constraint_id": {
+          "minLength": 1,
+          "title": "Unresolved Physical Constraint Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "unresolved_physical_constraint_id",
+        "director_scene_entity_ids",
+        "director_physical_question_ids"
+      ],
+      "title": "ValidationUnresolvedReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "agent": {
+      "const": "validation_readiness_agent",
+      "title": "Agent",
+      "type": "string"
+    },
+    "contract_version": {
+      "const": "0.1",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "dependency_coverage": {
+      "items": {
+        "$ref": "#/$defs/ValidationDependencyCoverage"
+      },
+      "title": "Dependency Coverage",
+      "type": "array"
+    },
+    "hook_readiness": {
+      "items": {
+        "$ref": "#/$defs/ValidationHookReadiness"
+      },
+      "title": "Hook Readiness",
+      "type": "array"
+    },
+    "input_scope": {
+      "$ref": "#/$defs/ValidationReadinessScope"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "readiness_summary": {
+      "minLength": 1,
+      "title": "Readiness Summary",
+      "type": "string"
+    },
+    "required_execution_classes": {
+      "items": {
+        "$ref": "#/$defs/ValidationRequirementClass"
+      },
+      "title": "Required Execution Classes",
+      "type": "array"
+    },
+    "subject_readiness": {
+      "items": {
+        "$ref": "#/$defs/ValidationSubjectReadiness"
+      },
+      "title": "Subject Readiness",
+      "type": "array"
+    },
+    "target_readiness": {
+      "items": {
+        "$ref": "#/$defs/ValidationTargetReadiness"
+      },
+      "title": "Target Readiness",
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_version",
+    "agent",
+    "input_scope",
+    "target_readiness",
+    "hook_readiness",
+    "subject_readiness",
+    "dependency_coverage",
+    "required_execution_classes",
+    "readiness_summary",
+    "limitations"
+  ],
+  "title": "ValidationReadinessContract",
+  "type": "object"
+}
