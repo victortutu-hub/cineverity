@@ -1,78 +1,101 @@
 # CineVerity
 
-**Agentic AI technical director for physically grounded cinematic scene planning, research, and validation.**
+**An agentic AI technical director for physically grounded cinematic scene planning.**
 
 > Development build for the **Agentic Cinema: The Blockbuster Hackathon 2026**.
 
 ## Vision
 
-CineVerity explores an agentic workflow that bridges creative cinematic intent and physical reality.
+CineVerity helps filmmakers and technical artists turn a creative brief into a traceable, physically aware scene plan. It distinguishes evidence-grounded constraints, unresolved uncertainty, and deliberate artistic deviations—so reality can be bent intentionally rather than accidentally.
 
-A filmmaker or technical artist describes the scene they want to create. The system is intended to:
-
-1. interpret the creative goal,
-2. research relevant evidence at runtime,
-3. extract physical and technical constraints,
-4. convert those constraints into a production-oriented scene specification,
-5. validate the result for contradictions, uncertainty, and unsupported assumptions.
-
-The goal is **not** to replace artistic direction or automatically generate a movie.
-
-CineVerity is designed to help creators understand what should be physically true, what is uncertain, which recommendations are evidence-grounded, and where reality is being intentionally bent for artistic reasons.
+It is not a movie generator or a replacement for artistic direction.
 
 ## Core question
 
 > **Can an AI system help filmmakers bend reality intentionally, rather than accidentally?**
 
-## Planned agentic workflow
+## Implemented workflow stages
 
 ```text
 Creative Intent
-      |
-      v
-Director Agent
-      |
-      +--> Research Agent ------> Parallel Search API
-      |
-      +--> Physical Constraints Agent
-      |
-      +--> Scene Planning Agent
-      |
-      +--> Validation Agent
-      |
-      v
-Evidence-grounded Cinematic Production Plan
+→ Director Agent
+→ Research Retrieval via Parallel Search API
+→ Gemini Research Synthesis
+→ Physical Constraints Agent
+→ Scene Planning Agent
+→ Validation Readiness Agent
 ```
 
-## Planned stack
+Each stage has its own controlled runner and validated contract boundary. A single automatic end-to-end orchestrator is not implemented yet.
+
+**Validation Readiness Agent** is preflight/readiness only. It does not mean rendering, simulation, measurement, scientific validation, or any other validation execution has occurred.
+
+## Implemented today
+
+- Director structured intent contract, schema boundary, and Gemini/ADK runtime.
+- Research Evidence contract, bounded Parallel Search API retrieval with deterministic search planning, Gemini research synthesis, and provenance preservation.
+- Physical Constraints contract, canonical serialization boundary, closed-input runtime, and cross-contract fidelity gates.
+- Scene Planning contract, canonical serialization boundary, closed-input runtime, and runtime-owned canonical SHA-256 snapshot fingerprints.
+- Validation Readiness contract, canonical serialization boundary, and closed-input preflight runtime.
+- Deterministic cross-contract scope/fingerprint derivation, exact candidate fidelity checks, and offline automated tests.
+
+### Acceptance principle
+
+```text
+validated upstream contracts
+→ deterministic scope/fingerprint derivation
+→ one model candidate
+→ Pydantic validation
+→ exact provenance/scope fidelity gate
+→ accept or explicit reject
+```
+
+This keeps model generation bounded while deterministic code owns provenance, identifiers, scope, and snapshot binding.
+
+## Implemented stack
 
 - Python
-- FastAPI
-- Gemini on Google Cloud
-- Google Agent Development Kit / Gemini Enterprise Agent Platform
-- Parallel Search API
-- MCP-based integrations where appropriate
-- JavaScript, HTML and CSS
-- Google Cloud deployment services
+- Gemini on Google Cloud / Vertex AI
+- Google ADK and ADK app runtime
+- Parallel Search API via its official Python SDK
+- Pydantic
+- HTML, CSS, and JavaScript development landing page
 
-Only technologies that are actually implemented in the final build will be claimed in the hackathon submission.
+## Planned / deployment direction
+
+- Full end-to-end orchestration across the complete pipeline
+- Hosted functional MVP and deployment services
+- Renderer, simulation, measurement, and executed validation systems
+- Demo and final hackathon submission assets
+
+## Local setup
+
+Verified with Python 3.11.9.
+
+```text
+python -m venv .venv
+python -m pip install -r requirements-dev.txt
+gcloud auth application-default login
+python -m pytest -q
+```
+
+Set the required Google Cloud environment variables in your shell; CineVerity does not automatically load `.env`. See [`docs/setup.md`](docs/setup.md) for authentication, environment examples, offline tests, and the manual stage-by-stage workflow.
 
 ## Repository status
 
-CineVerity is a **new project created during the hackathon period**. The repository intentionally starts from a minimal baseline so that its implementation history remains clear and auditable.
+CineVerity is a **new project created during the hackathon period**. The repository deliberately keeps its implementation history visible and auditable.
 
-Current stage:
-
-- [x] Public repository initialized
-- [x] MIT open-source license
-- [x] Initial project documentation
+- [x] Public repository, MIT license, and project documentation
 - [x] Development landing page
-- [ ] Agent orchestration layer
-- [ ] Parallel runtime research integration
-- [ ] Physical-constraint extraction
-- [ ] Scene-plan schema
-- [ ] Validation pipeline
+- [x] Director Agent runtime
+- [x] Parallel runtime research integration
+- [x] Gemini research synthesis and provenance boundary
+- [x] Physical Constraints
+- [x] Scene Planning
+- [x] Validation Readiness
+- [ ] Full end-to-end orchestration
 - [ ] Hosted functional MVP
+- [ ] Executed renderer/simulation/measurement validation
 - [ ] Demo and final submission assets
 
 ## Architecture
@@ -85,9 +108,7 @@ See [`docs/hackathon.md`](docs/hackathon.md).
 
 ## Development landing page
 
-The root [`index.html`](index.html) is a static development landing page intended for GitHub Pages while the functional application is being built.
-
-It intentionally does **not** claim unfinished features as implemented.
+The root [`index.html`](index.html) is a static development landing page. It is not a hosted functional MVP.
 
 ## License
 

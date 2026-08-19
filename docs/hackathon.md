@@ -1,87 +1,116 @@
-# CineVerity — Hackathon Development Notes
+# CineVerity — Hackathon Development & Submission Notes
 
-## Event
+## Event and target
 
 **Agentic Cinema: The Blockbuster Hackathon — 2026**
 
-This repository was created as a new project during the hackathon period.
+Submission deadline: **September 7, 2026 at 2:00 PM PDT**.
 
-## Submission direction
+CineVerity is a new project created during the contest period and targets the **Parallel** partner track.
 
-**CineVerity**
+## Current product boundary
 
-Working elevator pitch:
-
-> An agentic AI technical director that turns creative intent into physically grounded cinematic scene plans, coordinating research, materials, lighting, simulation, and validation.
-
-## Current partner-track direction
-
-**Parallel**
-
-Reason: CineVerity depends on runtime research and provenance. Parallel Search API can become a functional part of the workflow rather than a decorative integration.
+Implemented specialist workflow stages:
 
 ```text
 Creative Intent
-→ Agent decomposition
-→ Parallel runtime research
-→ Gemini reasoning
-→ Physical constraints
-→ Cinematic production plan
-→ Validation + provenance
+→ Director
+→ Parallel Research Retrieval
+→ Gemini Research Synthesis
+→ Physical Constraints
+→ Scene Planning
+→ Validation Readiness
 ```
 
-## Development transparency
+The repository contains controlled runners for these stages, not one complete automatic orchestration layer across the full flow.
 
-Do not claim unfinished features as implemented. During development use language such as **planned**, **target architecture**, **development build**, **prototype**, and **in progress**.
+Not implemented as a complete product flow:
 
-## Submission checklist
+- single automatic end-to-end orchestration;
+- hosted functional MVP;
+- executed renderer, simulation, measurement, or scientific validation.
+
+**Validation Readiness Agent** is structural preflight/readiness only. It does not mean renderer, simulation, measurement, or scientific validation has been executed.
+
+## Partner-track implementation
+
+Parallel Search API is actively used for Research retrieval through the official Python SDK. Search planning is deterministic and bounded; external search results are not claimed to be deterministic. The Research retrieval boundary preserves retrieved source identity and provenance for downstream synthesis.
+
+Parallel is not used by every agent. It is the runtime retrieval component for the Research stage.
+
+## Agentic functionality
+
+- [x] Gemini integration
+- [x] Google Cloud / ADK agent runtime
+- [x] Director Agent
+- [x] Research Agent
+- [x] Parallel Search API runtime integration
+- [x] Gemini research synthesis
+- [x] Physical Constraints Agent
+- [x] Scene Planning Agent
+- [x] Validation Readiness Agent
+- [ ] Full automatic end-to-end orchestration
+
+## Submission requirements to track
+
+The submitted project must be a functional AI agent or multi-agent system powered by Gemini and approved Google Cloud agent tooling, with active runtime use of the selected Partner service. It must run on at least one supported platform (web, Android, or iOS), be newly created during the contest period, and be public/open source with the source code, assets, and instructions needed to run the project.
+
+The submission also requires a hosted Project URL and a public YouTube or Vimeo demo video. The video should be no longer than 3 minutes; if longer, only the first 3 minutes are evaluated. Submission material must be in English or include English subtitles where applicable. Runtime AI use is limited to Google Cloud AI tooling and the selected Partner product's permitted built-in AI capabilities.
 
 ### Repository
+
 - [x] Public repository
-- [x] Open-source license
+- [x] MIT/open-source license
 - [x] Initial README
 - [x] Architecture notes
 - [x] Development landing page
-- [ ] Functional source code
-- [ ] Setup instructions
-- [ ] Environment-variable template populated with names only
-- [ ] Tests
-- [ ] Final architecture diagram
+- [x] Functional source code
+- [x] Environment-variable template with names/placeholders only
+- [x] Automated tests
+- [x] Complete setup/run instructions
+- [ ] Final architecture diagram or visual
 
 ### Hosted project
+
 - [x] Static development landing page prepared
-- [ ] GitHub Pages activated
+- [x] GitHub Pages activated/verified
 - [ ] Functional MVP deployed
-- [ ] Final hosted URL verified
+- [ ] Final hosted Project URL verified
 
-### Agentic functionality
-- [ ] Gemini integration
-- [ ] Google Cloud / agent platform integration
-- [ ] Director Agent
-- [ ] Research Agent
-- [ ] Parallel Search API runtime call
-- [ ] Physical Constraints Agent
-- [ ] Scene Planning Agent
-- [ ] Validation Agent
+### Final submission evidence
 
-### Submission media
+Implementation exists in code for Google Cloud runtime and Parallel Search API retrieval. Final live demo/submission evidence is still to be prepared.
+
+- [ ] Hosted functional Project URL
+- [x] Complete setup/run instructions
+- [ ] Final architecture diagram or visual
 - [ ] Screenshots
-- [ ] Architecture visual
-- [ ] Demo scenario
-- [ ] 3-minute demo video
-- [ ] Final Devpost copy
+- [ ] Final demo scenario
+- [ ] Public YouTube/Vimeo demo video (≤3 minutes)
+- [ ] English narration/subtitles as needed
+- [ ] Final project description, findings, and learnings
+- [ ] Final Devpost submission
+- [ ] Runtime demonstration of Google Cloud
+- [ ] Runtime demonstration of Parallel Search API
 
-## Suggested MVP demo scenario
+## Runtime compliance
+
+Current runtime AI architecture uses Gemini on Google Cloud, Google ADK and Google Cloud runtime tooling, and Parallel Search API for the selected partner track. The runtime does not claim use of other AI providers.
+
+## Candidate demo scenario
 
 > Create a macro cinematic shot of a rotating crystal illuminated by three colored lights, with strong internal refraction and visible spectral dispersion.
 
-This scenario naturally requires optics research, material properties, lighting constraints, physical plausibility, artistic intent, and validation. It is a test case, not a limitation of the product.
+This remains a candidate demo scenario, not a limitation of CineVerity and not a claim that the final demo has been recorded.
 
-## Guardrails
+## Development transparency and guardrails
 
-1. Do not commit API keys or credentials.
-2. Do not claim a technology was used unless it exists in the working implementation.
-3. Keep partner-track integration observable in the runtime path.
-4. Preserve source provenance when research affects technical recommendations.
-5. Keep artistic overrides explicit.
-6. Keep the project independent from pre-existing applications.
+Keep the distinction between **implemented** and **in progress / required for submission** explicit.
+
+1. Never commit API keys or credentials.
+2. Claim only technology present in the working implementation.
+3. Keep Parallel runtime integration observable in the live demo path.
+4. Preserve research provenance when it affects downstream recommendations.
+5. Keep artistic deviations explicit.
+6. Distinguish readiness from executed validation.
+7. Preserve the project's independent, new-project history.

@@ -121,7 +121,7 @@ The controlled runner accepts:
 --physical-constraints-contract PATH
 ```
 
-There is no `--research-contract`. Defaults are `GOOGLE_CLOUD_PROJECT=cineverity-hackathon-2026`, `GOOGLE_CLOUD_LOCATION=global`, `GOOGLE_GENAI_USE_ENTERPRISE=True`, and `CINEVERITY_GEMINI_MODEL=gemini-3.5-flash`.
+There is no `--research-contract`. `GOOGLE_CLOUD_PROJECT` is required and has no developer-specific default. Defaults are `GOOGLE_CLOUD_LOCATION=global`, `GOOGLE_GENAI_USE_ENTERPRISE=True`, and `CINEVERITY_GEMINI_MODEL=gemini-3.5-flash`.
 
 Its order is environment resolution, `vertexai.init`, enterprise check, lazy imports, UTF-8 reads, `validate_runtime_inputs`, `synthesize_scene_planning`, then accepted JSON on stdout. Output uses `model_dump_json(indent=2)` and UTF-8 stdout. Runner stdout JSON is not canonical fingerprint bytes and is never hashed.
 
