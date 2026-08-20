@@ -2,3 +2,5 @@ google-genai
 google-cloud-aiplatform[agent_engines,adk]>=1.112
 parallel-web>=1.0.1,<2.0.0
 pydantic>=2,<3
+fastapi>=0.115,<1
+uvicorn>=0.30,<1

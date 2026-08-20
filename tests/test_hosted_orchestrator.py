@@ -253,3 +253,43 @@ def test_parallel_failure_is_distinct_after_successful_planning(monkeypatch):
     assert error.value.stage == "parallel_retrieval"
     assert error.value.__cause__ is original_error
     assert calls == {"planning": 1, "parallel": 1, "research": 0, "physical": 0, "scene": 0, "validation": 0}
+
+def test_observer_reports_real_stage_order_and_only_specialists_receive_artifacts(monkeypatch):
+    log = []
+    accepted = install_successful_pipeline(monkeypatch, log)
+    observed = []
+
+    async def observer(stage, status, artifact):
+        observed.append((stage, status, artifact))
+
+    result = asyncio.run(run_hosted_pipeline("brief", dependencies(), observer))
+    assert result.director is accepted["director"]
+    assert [(stage, status) for stage, status, _ in observed] == [
+        ("director", "running"), ("director", "accepted"),
+        ("research_planning", "running"), ("research_planning", "accepted"),
+        ("parallel_retrieval", "running"), ("parallel_retrieval", "accepted"),
+        ("research", "running"), ("research", "accepted"),
+        ("physical_constraints", "running"), ("physical_constraints", "accepted"),
+        ("scene_planning", "running"), ("scene_planning", "accepted"),
+        ("validation_readiness", "running"), ("validation_readiness", "accepted"),
+    ]
+    artifacts = {stage: artifact for stage, status, artifact in observed if status == "accepted"}
+    assert artifacts["director"] is accepted["director"]
+    assert artifacts["research"] is accepted["research"]
+    assert artifacts["physical_constraints"] is accepted["physical"]
+    assert artifacts["scene_planning"] is accepted["scene"]
+    assert artifacts["validation_readiness"] is accepted["validation"]
+    assert artifacts["research_planning"] is None
+    assert artifacts["parallel_retrieval"] is None
+
+
+def test_observer_failure_isolated_from_pipeline_acceptance_without_retry(monkeypatch):
+    log = []
+    accepted = install_successful_pipeline(monkeypatch, log)
+
+    def broken_observer(stage, status, artifact):
+        raise RuntimeError("transport observer failure")
+
+    result = asyncio.run(run_hosted_pipeline("brief", dependencies(), broken_observer))
+    assert result.validation_readiness is accepted["validation"]
+    assert log == ["director", "plans", "parallel", "research", "physical", "scene", "validation"]

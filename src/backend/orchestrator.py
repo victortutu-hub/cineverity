@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import asyncio
+import inspect
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Awaitable, Callable
 
 from src.contracts.director_intent import DirectorIntentContract
 from src.contracts.physical_constraints import PhysicalConstraintsContract
@@ -50,36 +51,75 @@ class HostedStageError(RuntimeError):
         self.stage = stage
 
 
-async def _run_stage(stage: str, operation: Any) -> Any:
+StageObserver = Callable[[str, str, Any | None], Awaitable[None] | None]
+
+
+async def _notify_observer(
+    observer: StageObserver | None,
+    stage: str,
+    status: str,
+    artifact: Any | None = None,
+) -> None:
+    """Isolate observation failure from provider/model and contract acceptance."""
+    if observer is None:
+        return
     try:
-        return await operation()
+        outcome = observer(stage, status, artifact)
+        if inspect.isawaitable(outcome):
+            await outcome
+    except Exception:
+        return
+
+
+async def _run_stage(
+    stage: str,
+    operation: Any,
+    observer: StageObserver | None,
+    *,
+    expose_artifact: bool,
+) -> Any:
+    await _notify_observer(observer, stage, "running")
+    try:
+        accepted = await operation()
     except HostedStageError:
         raise
     except Exception as err:
         raise HostedStageError(stage) from err
+    await _notify_observer(observer, stage, "accepted", accepted if expose_artifact else None)
+    return accepted
 
 
-def _run_sync_stage(stage: str, operation: Any) -> Any:
+async def _run_sync_stage(
+    stage: str,
+    operation: Any,
+    observer: StageObserver | None,
+) -> Any:
     """Run deterministic local work while preserving ordinary exception identity."""
+    await _notify_observer(observer, stage, "running")
     try:
-        return operation()
+        accepted = operation()
     except Exception as err:
         raise HostedStageError(stage) from err
+    await _notify_observer(observer, stage, "accepted")
+    return accepted
 
 
 async def run_hosted_pipeline(
     brief: str,
     dependencies: HostedRuntimeDependencies,
+    observer: StageObserver | None = None,
 ) -> HostedRunResult:
     """Run accepted contracts in fixed order; any failure stops the pipeline."""
     director = await _run_stage(
         "director",
         lambda: synthesize_director(dependencies.director_app, brief),
+        observer,
+        expose_artifact=True,
     )
-
-    plans = _run_sync_stage(
+    plans = await _run_sync_stage(
         "research_planning",
         lambda: build_search_plans(director),
+        observer,
     )
 
     async def retrieve_research() -> Any:
@@ -89,35 +129,38 @@ async def run_hosted_pipeline(
             dependencies.parallel_adapter,
         )
 
-    registry = await _run_stage("parallel_retrieval", retrieve_research)
+    registry = await _run_stage(
+        "parallel_retrieval", retrieve_research, observer, expose_artifact=False
+    )
     research = await _run_stage(
         "research",
         lambda: synthesize_with_app(dependencies.research_app, director, registry),
+        observer,
+        expose_artifact=True,
     )
     physical = await _run_stage(
         "physical_constraints",
         lambda: synthesize_physical_constraints(
-            dependencies.physical_constraints_app,
-            director,
-            research,
+            dependencies.physical_constraints_app, director, research
         ),
+        observer,
+        expose_artifact=True,
     )
     scene = await _run_stage(
         "scene_planning",
         lambda: synthesize_scene_planning(
-            dependencies.scene_planning_app,
-            director,
-            physical,
+            dependencies.scene_planning_app, director, physical
         ),
+        observer,
+        expose_artifact=True,
     )
     validation = await _run_stage(
         "validation_readiness",
         lambda: synthesize_validation_readiness(
-            dependencies.validation_readiness_app,
-            director,
-            physical,
-            scene,
+            dependencies.validation_readiness_app, director, physical, scene
         ),
+        observer,
+        expose_artifact=True,
     )
     return HostedRunResult(
         director=director,
