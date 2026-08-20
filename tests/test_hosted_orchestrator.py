@@ -293,3 +293,56 @@ def test_observer_failure_isolated_from_pipeline_acceptance_without_retry(monkey
     result = asyncio.run(run_hosted_pipeline("brief", dependencies(), broken_observer))
     assert result.validation_readiness is accepted["validation"]
     assert log == ["director", "plans", "parallel", "research", "physical", "scene", "validation"]
+
+def test_parallel_thread_drains_before_repeated_pipeline_cancellation_completes(monkeypatch):
+    started = threading.Event()
+    release = threading.Event()
+    calls = {name: 0 for name in ("parallel", "research", "physical", "scene", "validation")}
+
+    async def director_stage(app, brief):
+        return object()
+
+    def planning_stage(director):
+        return ["plan"]
+
+    def retrieval(plans, adapter):
+        calls["parallel"] += 1
+        started.set()
+        assert release.wait(timeout=5)
+        return object()
+
+    async def research_stage(*args):
+        calls["research"] += 1
+
+    async def physical_stage(*args):
+        calls["physical"] += 1
+
+    async def scene_stage(*args):
+        calls["scene"] += 1
+
+    async def validation_stage(*args):
+        calls["validation"] += 1
+
+    monkeypatch.setattr(orchestrator, "synthesize_director", director_stage)
+    monkeypatch.setattr(orchestrator, "build_search_plans", planning_stage)
+    monkeypatch.setattr(orchestrator, "execute_search_plans", retrieval)
+    monkeypatch.setattr(orchestrator, "synthesize_with_app", research_stage)
+    monkeypatch.setattr(orchestrator, "synthesize_physical_constraints", physical_stage)
+    monkeypatch.setattr(orchestrator, "synthesize_scene_planning", scene_stage)
+    monkeypatch.setattr(orchestrator, "synthesize_validation_readiness", validation_stage)
+
+    async def exercise():
+        pipeline_task = asyncio.create_task(run_hosted_pipeline("brief", dependencies()))
+        await asyncio.to_thread(started.wait)
+        pipeline_task.cancel()
+        await asyncio.sleep(0)
+        assert not pipeline_task.done()
+        pipeline_task.cancel()
+        await asyncio.sleep(0)
+        assert not pipeline_task.done()
+        release.set()
+        with pytest.raises(asyncio.CancelledError):
+            await pipeline_task
+
+    asyncio.run(exercise())
+    assert calls == {"parallel": 1, "research": 0, "physical": 0, "scene": 0, "validation": 0}

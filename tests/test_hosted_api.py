@@ -2,14 +2,19 @@
 
 import asyncio
 import json
+import threading
+from types import SimpleNamespace
 
 import pytest
 
 from fastapi.testclient import TestClient
+from starlette.requests import Request
 
-from src.backend.app import ProcessRunGate, _run_with_owned_gate, create_app
+from src.backend.app import ProcessRunGate, RunRequest, _run_with_owned_gate, create_app
 from src.backend.bootstrap import HostedRuntimeBootstrapError
 from src.backend.orchestrator import HostedRuntimeDependencies, HostedStageError
+import src.backend.app as app_module
+import src.backend.orchestrator as orchestrator
 
 
 class FakeProvider:
@@ -181,3 +186,273 @@ def test_gate_releases_only_when_owned_pipeline_task_completes():
         gate.release()
 
     asyncio.run(exercise())
+
+@pytest.mark.parametrize("timeout", [0, -1, float("inf"), float("nan"), True, "bad"])
+def test_invalid_run_timeout_is_rejected_during_app_construction(timeout):
+    with pytest.raises(ValueError):
+        create_app(run_timeout_seconds=timeout)
+
+
+def test_soft_timeout_streams_terminal_events_without_completion():
+    async def slow_pipeline(brief, dependencies, observer):
+        await observer("director", "running", None)
+        await asyncio.Event().wait()
+
+    response = TestClient(
+        create_app(
+            runtime_provider=FakeProvider(),
+            pipeline_callable=slow_pipeline,
+            run_timeout_seconds=0.01,
+        )
+    ).post("/api/runs", json={"brief": "ok"})
+    events = stream_events(response)
+    assert [event["type"] for event in events] == [
+        "run_started", "stage_started", "stage_failed", "run_failed"
+    ]
+    assert events[-1]["error"]["code"] == "run_timeout"
+    assert events[-1]["stage"] == "director"
+    assert "run_completed" not in response.text
+
+
+def test_owner_cancellation_keeps_gate_until_real_parallel_worker_drains(monkeypatch):
+    started = threading.Event()
+    release = threading.Event()
+    calls = {name: 0 for name in ("parallel", "research", "physical", "scene", "validation")}
+    dependencies = HostedRuntimeDependencies(*(SimpleNamespace() for _ in range(6)))
+
+    async def director_stage(app, brief):
+        return object()
+
+    def planning_stage(director):
+        return ["plan"]
+
+    def retrieval(plans, adapter):
+        calls["parallel"] += 1
+        started.set()
+        assert release.wait(timeout=5)
+        return object()
+
+    async def research_stage(*args):
+        calls["research"] += 1
+
+    async def physical_stage(*args):
+        calls["physical"] += 1
+
+    async def scene_stage(*args):
+        calls["scene"] += 1
+
+    async def validation_stage(*args):
+        calls["validation"] += 1
+
+    monkeypatch.setattr(orchestrator, "synthesize_director", director_stage)
+    monkeypatch.setattr(orchestrator, "build_search_plans", planning_stage)
+    monkeypatch.setattr(orchestrator, "execute_search_plans", retrieval)
+    monkeypatch.setattr(orchestrator, "synthesize_with_app", research_stage)
+    monkeypatch.setattr(orchestrator, "synthesize_physical_constraints", physical_stage)
+    monkeypatch.setattr(orchestrator, "synthesize_scene_planning", scene_stage)
+    monkeypatch.setattr(orchestrator, "synthesize_validation_readiness", validation_stage)
+    gate = ProcessRunGate()
+    assert gate.try_acquire()
+
+    async def owner_operation():
+        await orchestrator.run_hosted_pipeline("brief", dependencies)
+
+    async def exercise():
+        owner_task = asyncio.create_task(_run_with_owned_gate(gate, owner_operation))
+        await asyncio.to_thread(started.wait)
+        owner_task.cancel()
+        await asyncio.sleep(0)
+        assert not owner_task.done()
+        assert not gate.try_acquire()
+        owner_task.cancel()
+        await asyncio.sleep(0)
+        assert not owner_task.done()
+        assert not gate.try_acquire()
+        release.set()
+        with pytest.raises(asyncio.CancelledError):
+            await owner_task
+        assert gate.try_acquire()
+        gate.release()
+
+    asyncio.run(exercise())
+    assert calls == {"parallel": 1, "research": 0, "physical": 0, "scene": 0, "validation": 0}
+
+def test_timeout_never_enqueues_run_completed_after_the_stream_sentinel(monkeypatch):
+    original_queue = asyncio.Queue
+    queue_records = []
+
+    class TrackingQueue(original_queue):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.record = []
+            queue_records.append(self.record)
+
+        async def put(self, value):
+            self.record.append(value)
+            await super().put(value)
+
+    async def slow_pipeline(brief, dependencies, observer):
+        await observer("director", "running", None)
+        await asyncio.Event().wait()
+
+    monkeypatch.setattr(app_module.asyncio, "Queue", TrackingQueue)
+    response = TestClient(
+        create_app(
+            runtime_provider=FakeProvider(),
+            pipeline_callable=slow_pipeline,
+            run_timeout_seconds=0.01,
+        )
+    ).post("/api/runs", json={"brief": "ok"})
+    assert response.status_code == 200
+    record = next(record for record in queue_records if any(
+        isinstance(value, dict) and value.get("type") == "run_started" for value in record
+    ))
+    sentinel_index = record.index(None)
+    assert all(
+        not isinstance(value, dict) or value.get("type") != "run_completed"
+        for value in record
+    )
+    assert record[sentinel_index + 1:] == []
+
+
+def test_owner_cancellation_after_timeout_drains_real_worker_before_gate_release(monkeypatch):
+    started = threading.Event()
+    release = threading.Event()
+    calls = {name: 0 for name in ("parallel", "research", "physical", "scene", "validation")}
+    dependencies = HostedRuntimeDependencies(*(SimpleNamespace() for _ in range(6)))
+
+    async def director_stage(app, brief):
+        return object()
+
+    def planning_stage(director):
+        return ["plan"]
+
+    def retrieval(plans, adapter):
+        calls["parallel"] += 1
+        started.set()
+        assert release.wait(timeout=5)
+        return object()
+
+    async def research_stage(*args):
+        calls["research"] += 1
+
+    async def physical_stage(*args):
+        calls["physical"] += 1
+
+    async def scene_stage(*args):
+        calls["scene"] += 1
+
+    async def validation_stage(*args):
+        calls["validation"] += 1
+
+    monkeypatch.setattr(orchestrator, "synthesize_director", director_stage)
+    monkeypatch.setattr(orchestrator, "build_search_plans", planning_stage)
+    monkeypatch.setattr(orchestrator, "execute_search_plans", retrieval)
+    monkeypatch.setattr(orchestrator, "synthesize_with_app", research_stage)
+    monkeypatch.setattr(orchestrator, "synthesize_physical_constraints", physical_stage)
+    monkeypatch.setattr(orchestrator, "synthesize_scene_planning", scene_stage)
+    monkeypatch.setattr(orchestrator, "synthesize_validation_readiness", validation_stage)
+    app = create_app(
+        runtime_provider=FakeProvider(),
+        pipeline_callable=orchestrator.run_hosted_pipeline,
+        run_timeout_seconds=0.01,
+    )
+    app.state.runtime_provider.dependencies = dependencies
+    endpoint = next(route.endpoint for route in app.routes if route.path == "/api/runs")
+    request = Request({"type": "http", "method": "POST", "path": "/api/runs", "headers": [(b"content-type", b"application/json")]})
+
+    async def exercise():
+        response = await endpoint(request, RunRequest(brief="ok"))
+        chunks = [chunk async for chunk in response.body_iterator]
+        events = [json.loads(chunk.decode("utf-8")) for chunk in chunks]
+        assert events[0]["type"] == "run_started"
+        assert any(
+            event["type"] == "stage_started" and event["stage"] == "parallel_retrieval"
+            for event in events
+        )
+        assert [event["type"] for event in events[-2:]] == ["stage_failed", "run_failed"]
+        assert events[-1]["error"]["code"] == "run_timeout"
+        await asyncio.to_thread(started.wait)
+        owner_task = next(iter(app.state.active_tasks))
+        assert not owner_task.done()
+        assert not app.state.run_gate.try_acquire()
+        owner_task.cancel()
+        await asyncio.sleep(0)
+        assert not owner_task.done()
+        assert not app.state.run_gate.try_acquire()
+        owner_task.cancel()
+        await asyncio.sleep(0)
+        assert not owner_task.done()
+        assert not app.state.run_gate.try_acquire()
+        release.set()
+        with pytest.raises(asyncio.CancelledError):
+            await owner_task
+        assert app.state.run_gate.try_acquire()
+        app.state.run_gate.release()
+
+    asyncio.run(exercise())
+    assert calls == {"parallel": 1, "research": 0, "physical": 0, "scene": 0, "validation": 0}
+
+def test_normal_timeout_drains_real_parallel_worker_without_cancelling_owner(monkeypatch):
+    started = threading.Event()
+    release = threading.Event()
+    calls = {name: 0 for name in ("parallel", "research", "physical", "scene", "validation")}
+    dependencies = HostedRuntimeDependencies(*(SimpleNamespace() for _ in range(6)))
+
+    async def director_stage(app, brief):
+        return object()
+
+    def planning_stage(director):
+        return ["plan"]
+
+    def retrieval(plans, adapter):
+        calls["parallel"] += 1
+        started.set()
+        assert release.wait(timeout=5)
+        return object()
+
+    async def research_stage(*args):
+        calls["research"] += 1
+
+    async def physical_stage(*args):
+        calls["physical"] += 1
+
+    async def scene_stage(*args):
+        calls["scene"] += 1
+
+    async def validation_stage(*args):
+        calls["validation"] += 1
+
+    monkeypatch.setattr(orchestrator, "synthesize_director", director_stage)
+    monkeypatch.setattr(orchestrator, "build_search_plans", planning_stage)
+    monkeypatch.setattr(orchestrator, "execute_search_plans", retrieval)
+    monkeypatch.setattr(orchestrator, "synthesize_with_app", research_stage)
+    monkeypatch.setattr(orchestrator, "synthesize_physical_constraints", physical_stage)
+    monkeypatch.setattr(orchestrator, "synthesize_scene_planning", scene_stage)
+    monkeypatch.setattr(orchestrator, "synthesize_validation_readiness", validation_stage)
+    app = create_app(
+        runtime_provider=FakeProvider(),
+        pipeline_callable=orchestrator.run_hosted_pipeline,
+        run_timeout_seconds=0.01,
+    )
+    app.state.runtime_provider.dependencies = dependencies
+    endpoint = next(route.endpoint for route in app.routes if route.path == "/api/runs")
+    request = Request({"type": "http", "method": "POST", "path": "/api/runs", "headers": [(b"content-type", b"application/json")]})
+
+    async def exercise():
+        response = await endpoint(request, RunRequest(brief="ok"))
+        chunks = [chunk async for chunk in response.body_iterator]
+        events = [json.loads(chunk.decode("utf-8")) for chunk in chunks]
+        assert events[-1]["error"]["code"] == "run_timeout"
+        assert all(event["type"] != "run_completed" for event in events)
+        await asyncio.to_thread(started.wait)
+        owner_task = next(iter(app.state.active_tasks))
+        assert not owner_task.done()
+        assert not app.state.run_gate.try_acquire()
+        release.set()
+        await owner_task
+        assert app.state.run_gate.try_acquire()
+        app.state.run_gate.release()
+
+    asyncio.run(exercise())
+    assert calls == {"parallel": 1, "research": 0, "physical": 0, "scene": 0, "validation": 0}

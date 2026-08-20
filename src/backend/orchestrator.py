@@ -104,6 +104,31 @@ async def _run_sync_stage(
     return accepted
 
 
+async def _await_parallel_worker(
+    plans: Any,
+    parallel_adapter: Any,
+) -> Any:
+    """Drain the physical worker after coroutine cancellation before re-raising."""
+    worker_task = asyncio.create_task(
+        asyncio.to_thread(execute_search_plans, plans, parallel_adapter)
+    )
+    try:
+        return await asyncio.shield(worker_task)
+    except asyncio.CancelledError as cancellation:
+        while not worker_task.done():
+            try:
+                await asyncio.shield(worker_task)
+            except asyncio.CancelledError:
+                continue
+            except Exception:
+                break
+        if worker_task.done():
+            try:
+                worker_task.result()
+            except (asyncio.CancelledError, Exception):
+                pass
+        raise cancellation
+
 async def run_hosted_pipeline(
     brief: str,
     dependencies: HostedRuntimeDependencies,
@@ -123,11 +148,7 @@ async def run_hosted_pipeline(
     )
 
     async def retrieve_research() -> Any:
-        return await asyncio.to_thread(
-            execute_search_plans,
-            plans,
-            dependencies.parallel_adapter,
-        )
+        return await _await_parallel_worker(plans, dependencies.parallel_adapter)
 
     registry = await _run_stage(
         "parallel_retrieval", retrieve_research, observer, expose_artifact=False
