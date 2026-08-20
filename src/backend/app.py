@@ -5,13 +5,14 @@ from __future__ import annotations
 import asyncio
 import json
 import math
+from pathlib import Path
 import threading
 import uuid
 from collections.abc import AsyncIterator, Awaitable, Callable
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request, status
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
 
 from src.backend.bootstrap import HostedRuntimeBootstrapError, HostedRuntimeProvider
@@ -19,6 +20,12 @@ from src.backend.orchestrator import HostedStageError, HostedRuntimeDependencies
 
 
 DEFAULT_RUN_TIMEOUT_SECONDS = 900.0
+FRONTEND_DIRECTORY = Path(__file__).resolve().parents[1] / "frontend"
+FRONTEND_CSP = (
+    "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; "
+    "font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; "
+    "frame-ancestors 'none'; form-action 'self'"
+)
 
 
 class RunRequest(BaseModel):
@@ -119,6 +126,25 @@ def create_app(
     app.state.run_gate = run_gate or ProcessRunGate()
     app.state.active_tasks: set[asyncio.Task[Any]] = set()
 
+    @app.get("/", include_in_schema=False)
+    async def frontend_index() -> FileResponse:
+        response = FileResponse(FRONTEND_DIRECTORY / "index.html", media_type="text/html")
+        response.headers["Content-Security-Policy"] = FRONTEND_CSP
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        return response
+
+    @app.get("/assets/app.js", include_in_schema=False)
+    async def frontend_script() -> FileResponse:
+        response = FileResponse(FRONTEND_DIRECTORY / "app.js", media_type="application/javascript")
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        return response
+
+    @app.get("/assets/styles.css", include_in_schema=False)
+    async def frontend_styles() -> FileResponse:
+        response = FileResponse(FRONTEND_DIRECTORY / "styles.css", media_type="text/css")
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        return response
     @app.get("/healthz")
     async def healthz() -> dict[str, str]:
         return {"status": "ok"}

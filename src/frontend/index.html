@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CineVerity | Cinematic Technical Direction</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/app.js" defer></script>
+</head>
+<body>
+  <main class="console" aria-busy="false">
+    <header class="identity">
+      <p class="eyebrow">CineVerity</p>
+      <h1>Evidence-grounded cinematic technical direction.</h1>
+      <p>Stage updates below are emitted by the hosted pipeline. No percentage progress is estimated.</p>
+    </header>
+
+    <section class="composer panel" aria-labelledby="brief-heading">
+      <div class="section-heading"><p class="eyebrow">Creative input</p><h2 id="brief-heading">Scene brief</h2></div>
+      <form id="brief-form">
+        <label for="brief">Describe the cinematic scene you want to direct.</label>
+        <textarea id="brief" name="brief" maxlength="6000" required aria-describedby="brief-counter" placeholder="Describe the scene, material behavior, lighting, and intended visual deviation."></textarea>
+        <div class="form-meta"><span id="brief-counter" aria-live="polite">0 / 6000</span><button id="sample-brief" type="button" class="quiet-button">Load sample brief</button></div>
+        <button id="run-button" type="submit">Run CineVerity</button>
+      </form>
+    </section>
+
+    <section class="runtime panel" aria-labelledby="runtime-heading">
+      <div class="section-heading"><p class="eyebrow">Hosted runtime</p><h2 id="runtime-heading">Pipeline stages</h2></div>
+      <ol id="stage-rail" class="stage-rail" aria-label="Hosted pipeline stages"></ol>
+      <div class="run-identity"><span>Run ID</span><code id="run-id">Awaiting server-owned run identity.</code></div>
+      <div id="terminal-status" class="terminal-status" role="status" aria-live="polite">Ready for a creative brief.</div>
+    </section>
+
+    <section class="artifacts" aria-labelledby="artifacts-heading">
+      <div class="section-heading"><p class="eyebrow">Accepted contracts</p><h2 id="artifacts-heading">Specialist artifact workspace</h2></div>
+      <div id="artifact-grid" class="artifact-grid"></div>
+    </section>
+
+    <aside class="epistemic-note panel">
+      Validation Readiness describes whether a scene plan is structured for later validation. It does not mean rendering, simulation, measurement, or validation has already been executed.
+    </aside>
+  </main>
+</body>
+</html>
