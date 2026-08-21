@@ -133,7 +133,7 @@ docker build --platform linux/amd64 -t cineverity:local .
 docker run --rm -e PORT=8080 -p 8080:8080 cineverity:local
 ```
 
-Static assets and `GET /healthz` work without provider credentials. A real hosted run additionally needs `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION` when overriding the default, `GOOGLE_GENAI_USE_ENTERPRISE`, `CINEVERITY_GEMINI_MODEL` when overriding the default, and `PARALLEL_API_KEY`.
+Static assets and `GET /health` work without provider credentials. A real hosted run additionally needs `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION` when overriding the default, `GOOGLE_GENAI_USE_ENTERPRISE`, `CINEVERITY_GEMINI_MODEL` when overriding the default, and `PARALLEL_API_KEY`.
 
 For a later Cloud Run deployment, Google authentication will use the Cloud Run service identity / ADC environment rather than a local service-account JSON copied into the image. This repository does not yet document or perform Cloud Run deployment commands.
 ## Live Google smoke tests

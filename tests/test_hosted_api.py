@@ -61,10 +61,11 @@ def stream_events(response):
     return [json.loads(line) for line in lines]
 
 
-def test_healthz_is_offline_and_provider_is_not_initialized():
+def test_health_is_offline_and_provider_is_not_initialized():
     provider = FakeProvider()
     client = TestClient(create_app(runtime_provider=provider))
-    assert client.get("/healthz").json() == {"status": "ok"}
+    assert client.get("/health").json() == {"status": "ok"}
+    assert client.get("/healthz").status_code == 404
     assert provider.calls == 0
 
 
@@ -162,7 +163,7 @@ def test_busy_gate_rejects_second_run_and_health_remains_available():
     response = client.post("/api/runs", json={"brief": "ok"})
     assert response.status_code == 429
     assert response.json()["detail"]["code"] == "run_in_progress"
-    assert client.get("/healthz").status_code == 200
+    assert client.get("/health").status_code == 200
     gate.release()
 
 

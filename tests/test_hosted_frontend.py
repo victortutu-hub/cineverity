@@ -106,10 +106,10 @@ def test_frontend_files_have_no_external_runtime_dependency_or_sensitive_configu
     assert "repository-root `index.html` remains" in (__import__("pathlib").Path("src/frontend/README.md").read_text(encoding="utf-8").lower())
 
 
-def test_healthz_remains_independent_of_frontend_static_routes():
+def test_health_remains_independent_of_frontend_static_routes():
     provider = ProviderProbe()
     client = TestClient(create_app(runtime_provider=provider))
-    assert client.get("/healthz").json() == {"status": "ok"}
+    assert client.get("/health").json() == {"status": "ok"}
     assert provider.calls == 0
 
 def test_frontend_script_has_explicit_global_stage_and_terminal_protocol_guards():

@@ -145,8 +145,8 @@ def create_app(
         response = FileResponse(FRONTEND_DIRECTORY / "styles.css", media_type="text/css")
         response.headers["X-Content-Type-Options"] = "nosniff"
         return response
-    @app.get("/healthz")
-    async def healthz() -> dict[str, str]:
+    @app.get("/health")
+    async def health() -> dict[str, str]:
         return {"status": "ok"}
 
     @app.post("/api/runs")
