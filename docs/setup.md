@@ -2,7 +2,7 @@
 
 ## What this guide covers
 
-This guide explains how to install, authenticate, test, and manually run CineVerity's current specialist stages. It does not describe a hosted deployment, renderer, simulation system, or automatic end-to-end orchestrator.
+This guide explains how to install, authenticate, test, run CineVerity's hosted application locally, and manually run individual specialist stages. It does not describe Cloud Run deployment, a renderer, simulation system, or executed scientific validation.
 
 ## Verified Python version
 
@@ -19,7 +19,7 @@ No formal supported Python version range is declared yet. This guide does not cl
 - Vertex AI API: `aiplatform.googleapis.com`
 - A Parallel API key for the live Research retrieval stage
 
-The current local workflow does not require a service-account JSON file, FastAPI, Docker, Node.js, a renderer, or simulation software.
+The current local workflow does not require a service-account JSON file, Node.js, a renderer, or simulation software. Docker is optional for the hosted-container workflow below.
 
 ## Clone and create a virtual environment
 
@@ -118,6 +118,24 @@ python -m pytest -q
 
 The verified offline suite does not require Google Cloud or Parallel credentials. It uses fake applications and adapters at runtime boundaries; it does not make live Google or Parallel API calls.
 
+## Hosted local runtime and Docker
+
+The hosted application provides the functional frontend and the FastAPI NDJSON API. Run one Uvicorn worker because the process-local run gate intentionally has single-process semantics:
+
+```text
+python -m uvicorn src.backend.app:app --host 127.0.0.1 --port 8080 --workers 1
+```
+
+Build and run the equivalent Linux container locally:
+
+```text
+docker build --platform linux/amd64 -t cineverity:local .
+docker run --rm -e PORT=8080 -p 8080:8080 cineverity:local
+```
+
+Static assets and `GET /healthz` work without provider credentials. A real hosted run additionally needs `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION` when overriding the default, `GOOGLE_GENAI_USE_ENTERPRISE`, `CINEVERITY_GEMINI_MODEL` when overriding the default, and `PARALLEL_API_KEY`.
+
+For a later Cloud Run deployment, Google authentication will use the Cloud Run service identity / ADC environment rather than a local service-account JSON copied into the image. This repository does not yet document or perform Cloud Run deployment commands.
 ## Live Google smoke tests
 
 These are live Google Cloud/Gemini calls, separate from offline tests:
@@ -145,7 +163,7 @@ scene.json
 validation-readiness.json
 ```
 
-This is a manual, stage-by-stage workflow. A single automatic end-to-end orchestrator is not implemented yet.
+The hosted application can orchestrate the stages automatically. This section remains the manual, stage-by-stage specialist workflow for inspecting individual accepted artifacts.
 
 ### 1. Director
 

@@ -26,7 +26,7 @@ Creative Intent
 → Validation Readiness Agent
 ```
 
-Each stage has its own controlled runner and validated contract boundary. A single automatic end-to-end orchestrator is not implemented yet.
+Each stage has a controlled runtime and validated contract boundary. The hosted application now coordinates these stages automatically through a FastAPI NDJSON API and the functional frontend under `src/frontend/`.
 
 **Validation Readiness Agent** is preflight/readiness only. It does not mean rendering, simulation, measurement, scientific validation, or any other validation execution has occurred.
 
@@ -38,6 +38,8 @@ Each stage has its own controlled runner and validated contract boundary. A sing
 - Scene Planning contract, canonical serialization boundary, closed-input runtime, and runtime-owned canonical SHA-256 snapshot fingerprints.
 - Validation Readiness contract, canonical serialization boundary, and closed-input preflight runtime.
 - Deterministic cross-contract scope/fingerprint derivation, exact candidate fidelity checks, and offline automated tests.
+- Deterministic hosted orchestration, a FastAPI NDJSON API, timeout/cancellation hardening, and a no-build hosted frontend.
+- Docker runtime packaging with a digest-pinned Python base, exact-version runtime lock, bounded build context, and a non-root single-worker startup contract.
 
 ### Acceptance principle
 
@@ -59,12 +61,12 @@ This keeps model generation bounded while deterministic code owns provenance, id
 - Google ADK and ADK app runtime
 - Parallel Search API via its official Python SDK
 - Pydantic
-- HTML, CSS, and JavaScript development landing page
+- FastAPI and Uvicorn
+- HTML, CSS, and JavaScript hosted frontend
 
 ## Planned / deployment direction
 
-- Full end-to-end orchestration across the complete pipeline
-- Hosted functional MVP and deployment services
+- Cloud Run deployment services
 - Renderer, simulation, measurement, and executed validation systems
 - Demo and final hackathon submission assets
 
@@ -93,8 +95,9 @@ CineVerity is a **new project created during the hackathon period**. The reposit
 - [x] Physical Constraints
 - [x] Scene Planning
 - [x] Validation Readiness
-- [ ] Full end-to-end orchestration
-- [ ] Hosted functional MVP
+- [x] Hosted orchestration and functional frontend
+- [x] Docker runtime packaging
+- [ ] Cloud Run deployment
 - [ ] Executed renderer/simulation/measurement validation
 - [ ] Demo and final submission assets
 
@@ -108,7 +111,7 @@ See [`docs/hackathon.md`](docs/hackathon.md).
 
 ## Development landing page
 
-The root [`index.html`](index.html) is a static development landing page. It is not a hosted functional MVP.
+The root [`index.html`](index.html) is a static GitHub Pages development landing page. The hosted functional frontend is under `src/frontend/` and is served by FastAPI; Cloud Run deployment remains future work.
 
 ## License
 
