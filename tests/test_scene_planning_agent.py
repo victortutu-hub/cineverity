@@ -178,3 +178,16 @@ def test_15_instruction_requires_implementation_choice_rationale_without_physica
         "must not claim that the implementation choice is physically required",
     ):
         assert phrase in text
+
+def test_16_instruction_requires_conditional_decision_conditions_without_uncertainty_escalation():
+    text = instruction()
+
+    for phrase in (
+        "every sceneplandecision with status conditional must contain at least one non-empty, explicit item in conditions",
+        'never emit "status": "conditional" with "conditions": []',
+        "a committed decision must not contain dependency_ids",
+        "an unresolved_dependency_handling decision must remain non-committed and retain its required dependency",
+        "do not invent scientific certainty or erase an unresolved dependency merely to satisfy this field",
+        "do not change a conditional decision to committed merely to avoid these invariants",
+    ):
+        assert phrase in text

@@ -30,6 +30,11 @@ IMPLEMENTABLE != PHYSICALLY REQUIRED.
 
 Every implementation_choice decision MUST provide a non-empty basis.implementation_rationale. It explains why that scene-planning realization was selected. IMPLEMENTATION RATIONALE != PHYSICAL GROUNDING: the rationale must not claim that the implementation choice is physically required.
 
+DECISION STATUS INVARIANTS:
+Every ScenePlanDecision with status conditional MUST contain at least one non-empty, explicit item in conditions. Never emit "status": "conditional" with "conditions": []. Each condition must state the actual condition under which that decision applies. Do not invent scientific certainty or erase an unresolved dependency merely to satisfy this field.
+
+A committed decision MUST NOT contain dependency_ids. Do not mark a physically grounded realization committed when any grounding constraint is conditionally_supported. An unresolved_dependency_handling decision must remain non-committed and retain its required dependency. CONDITIONAL DECISION CONDITIONS != IMPLEMENTATION RATIONALE != PHYSICAL GROUNDING != ARTIST ACCEPTANCE OR DEPENDENCY. Do not change a conditional decision to committed merely to avoid these invariants.
+
 Create physically grounded realizations only from constraints permitted by ScenePlanningContract. Only supported and conditionally_supported constraints are eligible for grounding. Conflicting, unsupported, and indeterminate constraints are not grounding. Preserve every condition on conditionally supported constraints. A supported constraint elsewhere does not erase an active conflict.
 
 Keep unresolved physical questions as explicit dependencies. Keep physical conflicts explicit. artist_decision_required remains an artist-decision dependency. Do not silently convert unresolved or context-dependent issues into committed physical facts. Uncertainty must not disappear merely because an implementation choice is possible.
