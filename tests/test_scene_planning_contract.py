@@ -3,7 +3,7 @@ from copy import deepcopy
 import json
 import pytest
 from pydantic import ValidationError
-from src.contracts.scene_planning import ScenePlanningContract
+from src.contracts.scene_planning import SceneParameterValue, ScenePlanningContract
 
 H='a'*64; P='b'*64
 
@@ -97,3 +97,33 @@ def test_unsupported_constraint_coverage_matrix_rejects(state):
 
 def test_conditional_constraint_coverage_requires_conditional_decision():
     invalid(lambda p: p["coverage"][0].update({"state":"conditional"}))
+
+def test_scene_parameter_value_numeric_rejects_additional_concrete_field():
+    with pytest.raises(ValidationError):
+        SceneParameterValue.model_validate({"kind": "numeric", "numeric_value": "1.5", "descriptive_value": "commentary"})
+
+
+def test_scene_parameter_value_categorical_rejects_additional_concrete_field():
+    with pytest.raises(ValidationError):
+        SceneParameterValue.model_validate({"kind": "categorical", "categorical_value": "GGX", "descriptive_value": "commentary"})
+
+
+def test_scene_parameter_value_descriptive_rejects_additional_concrete_field():
+    with pytest.raises(ValidationError):
+        SceneParameterValue.model_validate({"kind": "descriptive", "descriptive_value": "soft", "numeric_value": "1"})
+
+
+def test_scene_parameter_value_boolean_rejects_additional_concrete_field():
+    with pytest.raises(ValidationError):
+        SceneParameterValue.model_validate({"kind": "boolean", "boolean_value": True, "descriptive_value": "commentary"})
+
+
+def test_scene_parameter_value_unresolved_rejects_unit():
+    with pytest.raises(ValidationError):
+        SceneParameterValue.model_validate({"kind": "unresolved", "unit": "m"})
+
+
+@pytest.mark.parametrize("numeric_value", ["NaN", "Infinity"])
+def test_scene_parameter_value_numeric_rejects_non_finite_decimal(numeric_value):
+    with pytest.raises(ValidationError):
+        SceneParameterValue.model_validate({"kind": "numeric", "numeric_value": numeric_value})

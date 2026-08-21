@@ -191,3 +191,24 @@ def test_16_instruction_requires_conditional_decision_conditions_without_uncerta
         "do not change a conditional decision to committed merely to avoid these invariants",
     ):
         assert phrase in text
+
+def test_17_instruction_requires_scene_parameter_value_kind_exclusivity():
+    text = instruction()
+
+    for phrase in (
+        "if kind is numeric, populate only numeric_value",
+        "it must be a finite decimal string",
+        "if kind is categorical, populate only a non-empty categorical_value",
+        "if kind is descriptive, populate only a non-empty descriptive_value",
+        "if kind is boolean, populate only boolean_value",
+        "if kind is unresolved, do not populate any concrete value field and do not populate unit",
+        "keep numeric_value, categorical_value, descriptive_value, boolean_value, and unit absent or null",
+        "for resolved kinds, unit may be supplied when appropriate",
+        "never populate multiple concrete value fields for completeness",
+        "never use descriptive_value as commentary when kind is numeric, categorical, boolean, or unresolved",
+        "never invent or guess a concrete value merely to avoid unresolved",
+        "preserve epistemic uncertainty",
+    ):
+        assert phrase in text
+
+    assert "must be explicitly serialized as null" not in text

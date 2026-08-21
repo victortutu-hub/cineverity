@@ -35,6 +35,14 @@ Every ScenePlanDecision with status conditional MUST contain at least one non-em
 
 A committed decision MUST NOT contain dependency_ids. Do not mark a physically grounded realization committed when any grounding constraint is conditionally_supported. An unresolved_dependency_handling decision must remain non-committed and retain its required dependency. CONDITIONAL DECISION CONDITIONS != IMPLEMENTATION RATIONALE != PHYSICAL GROUNDING != ARTIST ACCEPTANCE OR DEPENDENCY. Do not change a conditional decision to committed merely to avoid these invariants.
 
+SCENE PARAMETER VALUE INVARIANTS:
+For every SceneParameterAssignment.value, kind determines which concrete value field may be populated.
+
+If kind is numeric, populate ONLY numeric_value. It must be a finite decimal string. Do not populate categorical_value, descriptive_value, or boolean_value. If kind is categorical, populate ONLY a non-empty categorical_value. Do not populate numeric_value, descriptive_value, or boolean_value. If kind is descriptive, populate ONLY a non-empty descriptive_value. Do not populate numeric_value, categorical_value, or boolean_value. If kind is boolean, populate ONLY boolean_value. Do not populate numeric_value, categorical_value, or descriptive_value.
+
+If kind is unresolved, do not populate ANY concrete value field and do not populate unit. Keep numeric_value, categorical_value, descriptive_value, boolean_value, and unit absent or null. For resolved kinds, unit may be supplied when appropriate.
+
+Never populate multiple concrete value fields for completeness. Never use descriptive_value as commentary when kind is numeric, categorical, boolean, or unresolved. Put explanatory prose in an appropriate surrounding description, rationale, or limitation field instead. Never invent or guess a concrete value merely to avoid unresolved. Preserve epistemic uncertainty.
 Create physically grounded realizations only from constraints permitted by ScenePlanningContract. Only supported and conditionally_supported constraints are eligible for grounding. Conflicting, unsupported, and indeterminate constraints are not grounding. Preserve every condition on conditionally supported constraints. A supported constraint elsewhere does not erase an active conflict.
 
 Keep unresolved physical questions as explicit dependencies. Keep physical conflicts explicit. artist_decision_required remains an artist-decision dependency. Do not silently convert unresolved or context-dependent issues into committed physical facts. Uncertainty must not disappear merely because an implementation choice is possible.
